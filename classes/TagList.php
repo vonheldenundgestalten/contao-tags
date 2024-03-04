@@ -1,7 +1,9 @@
 <?php
 
 namespace Contao;
-
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
+use Contao\StringUtil;
 /**
  * Contao Open Source CMS - tags extension
  *
@@ -36,8 +38,8 @@ class TagList extends \System
 
 		$tagtable = (strlen($this->strTagTable)) ? $this->strTagTable : "tl_tag";
 		$tagfield = (strlen($this->strTagField)) ? $this->strTagField : "tag";
-
-		if (TL_MODE == 'BE')
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		if ($isBackend)
 		{
 			$blnExcludeUnpublishedItems = false;
 		}
@@ -197,8 +199,8 @@ class TagList extends \System
 		{
 			$tagtable = (strlen($this->strTagTable)) ? $this->strTagTable : "tl_tag";
 			$tagfield = (strlen($this->strTagField)) ? $this->strTagField : "tag";
-
-			if (TL_MODE == 'BE')
+			$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+			if ($isBackend)
 			{
 				$blnExcludeUnpublishedItems = false;
 			}
@@ -365,17 +367,17 @@ class TagList extends \System
 		if (count($this->arrPages))
 		{
 			$time = time();
-
+			$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser(); 
 			// Get published articles
 			$pids = implode(",", $this->arrPages);
 			if (strlen($this->inColumn))
 			{
-				$objArticles = $this->Database->prepare("SELECT id, title, alias, inColumn, cssID FROM tl_article WHERE inColumn = ? AND pid IN (" . $pids . ") " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
+				$objArticles = $this->Database->prepare("SELECT id, title, alias, inColumn, cssID FROM tl_article WHERE inColumn = ? AND pid IN (" . $pids . ") " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
 											  ->execute($this->inColumn, $time, $time);
 			}
 			else
 			{
-				$objArticles = $this->Database->prepare("SELECT id, title, alias, inColumn, cssID FROM tl_article WHERE pid IN (" . $pids . ") " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
+				$objArticles = $this->Database->prepare("SELECT id, title, alias, inColumn, cssID FROM tl_article WHERE pid IN (" . $pids . ") " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
 											  ->execute($time, $time);
 			}
 			if ($objArticles->numRows < 1)
@@ -391,7 +393,7 @@ class TagList extends \System
 					continue;
 				}
 
-				$cssID = deserialize($objArticles->cssID, true);
+				$cssID = StringUtil::deserialize($objArticles->cssID, true);
 				$alias = strlen($objArticles->alias) ? $objArticles->alias : $objArticles->title;
 
 				array_push($this->arrArticles, $objArticles->id);

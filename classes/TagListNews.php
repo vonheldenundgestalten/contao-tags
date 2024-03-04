@@ -1,7 +1,8 @@
 <?php
 
 namespace Contao;
-
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 /**
  * Class TagListNews
  *
@@ -16,7 +17,10 @@ class TagListNews extends TagList
 
 	public function getRelatedTagList($for_tags, $blnExcludeUnpublishedItems = true)
 	{
-		if (TL_MODE == 'BE')
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
+
+		if ($isBackend)
 		{
 			$blnExcludeUnpublishedItems = false;
 		}
@@ -27,7 +31,7 @@ class TagListNews extends TagList
 		$ids = array();
 		for ($i = 0; $i < count($for_tags); $i++)
 		{
-			$arr = $this->Database->prepare("SELECT DISTINCT tl_tag.tid FROM tl_tag, tl_news WHERE tl_tag.tid = tl_news.id AND tl_news.pid IN ('" . implode("','", $this->arrNewsarchives) . "') AND from_table = ? AND tag = ? " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY tl_tag.tid ASC")
+			$arr = $this->Database->prepare("SELECT DISTINCT tl_tag.tid FROM tl_tag, tl_news WHERE tl_tag.tid = tl_news.id AND tl_news.pid IN ('" . implode("','", $this->arrNewsarchives) . "') AND from_table = ? AND tag = ? " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY tl_tag.tid ASC")
 				->execute(array('tl_news', $for_tags[$i], time(), time()))
 				->fetchEach('tid');
 			if ($i == 0)
@@ -43,7 +47,7 @@ class TagListNews extends TagList
 		$arrCloudTags = array();
 		if (count($ids))
 		{
-			$objTags = $this->Database->prepare("SELECT tag, COUNT(tag) as count FROM tl_tag, tl_news WHERE tl_tag.tid = tl_news.id AND tl_news.pid IN ('" . implode("','", $this->arrNewsarchives) . "') AND from_table = ? AND tl_tag.tid IN (" . implode(",", $ids) . ") " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " GROUP BY tag ORDER BY tag ASC")
+			$objTags = $this->Database->prepare("SELECT tag, COUNT(tag) as count FROM tl_tag, tl_news WHERE tl_tag.tid = tl_news.id AND tl_news.pid IN ('" . implode("','", $this->arrNewsarchives) . "') AND from_table = ? AND tl_tag.tid IN (" . implode(",", $ids) . ") " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " GROUP BY tag ORDER BY tag ASC")
 				->execute('tl_news', time(), time());
 			$list = "";
 			$tags = array();
@@ -53,7 +57,7 @@ class TagListNews extends TagList
 				{
 					if (!in_array($objTags->tag, $for_tags))
 					{
-						$count = count($this->Database->prepare("SELECT tl_tag.tid FROM tl_tag, tl_news WHERE tl_tag.tid = tl_news.id AND tl_news.pid IN ('" . implode("','", $this->arrNewsarchives) . "') AND tag = ? AND from_table = ? " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " AND tl_tag.tid IN (" . implode(",", $ids) . ")")
+						$count = count($this->Database->prepare("SELECT tl_tag.tid FROM tl_tag, tl_news WHERE tl_tag.tid = tl_news.id AND tl_news.pid IN ('" . implode("','", $this->arrNewsarchives) . "') AND tag = ? AND from_table = ? " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " AND tl_tag.tid IN (" . implode(",", $ids) . ")")
 							->execute($objTags->tag, 'tl_news', time(), time())
 							->fetchAllAssoc());
 						array_push($tags, array('tag_name' => $objTags->tag, 'tag_count' => $count));
@@ -70,7 +74,9 @@ class TagListNews extends TagList
 
 	public function getTagList($blnExcludeUnpublishedItems = true)
 	{
-		if (TL_MODE == 'BE')
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
+		if ($isBackend)
 		{
 			$blnExcludeUnpublishedItems = false;
 		}
@@ -79,7 +85,7 @@ class TagListNews extends TagList
 		{
 			if (count($this->arrNewsarchives))
 			{
-				$objTags = $this->Database->prepare("SELECT tag, COUNT(tag) as count FROM tl_tag, tl_news WHERE tl_tag.tid = tl_news.id AND tl_news.pid IN ('" . implode("','", $this->arrNewsarchives) . "') AND from_table = ?" . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " GROUP BY tag ORDER BY tag ASC")
+				$objTags = $this->Database->prepare("SELECT tag, COUNT(tag) as count FROM tl_tag, tl_news WHERE tl_tag.tid = tl_news.id AND tl_news.pid IN ('" . implode("','", $this->arrNewsarchives) . "') AND from_table = ?" . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " GROUP BY tag ORDER BY tag ASC")
 					->execute('tl_news', time(), time());
 				$list = "";
 				$tags = array();

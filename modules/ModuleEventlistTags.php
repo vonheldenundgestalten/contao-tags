@@ -1,7 +1,8 @@
 <?php
 
 namespace Contao;
-
+use Contao\System;
+use Contao\StringUtil;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 
 /**

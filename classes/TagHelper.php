@@ -1,6 +1,7 @@
 <?php
 
 namespace Contao;
+use Contao\StringUtil;
 
 /**
  * Contao Open Source CMS - tags extension

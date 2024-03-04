@@ -9,6 +9,9 @@ namespace Contao;
  *
  * @license LGPL-3.0+
  */
+use Contao\System; 
+use Symfony\Component\HttpFoundation\Request;
+use Contao\StringUtil;
 
 class ModuleTagCloud extends \Module
 {
@@ -44,7 +47,8 @@ class ModuleTagCloud extends \Module
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		if ($isBackend)
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
 			$objTemplate->wildcard = '### TAGCLOUD ###';
@@ -58,11 +62,11 @@ class ModuleTagCloud extends \Module
 		$taglist->addNamedClass = $this->tag_named_class;
 		if (strlen($this->tag_tagtable)) $taglist->tagtable = $this->tag_tagtable;
 		if (strlen($this->tag_tagfield)) $taglist->tagfield = $this->tag_tagfield;
-		if (strlen($this->tag_sourcetables)) $taglist->fortable = deserialize($this->tag_sourcetables, TRUE);
+		if (strlen($this->tag_sourcetables)) $taglist->fortable = StringUtil::deserialize($this->tag_sourcetables, TRUE);
 		if (strlen($this->tag_topten_number) && $this->tag_topten_number > 0) $taglist->topnumber = $this->tag_topten_number;
 		if (strlen($this->tag_maxtags)) $taglist->maxtags = $this->tag_maxtags;
 		if (strlen($this->tag_buckets) && $this->tag_buckets > 0) $taglist->buckets = $this->tag_buckets;
-		if (strlen($this->pagesource)) $taglist->pagesource = deserialize($this->pagesource, TRUE);
+		if (strlen($this->pagesource)) $taglist->pagesource = StringUtil::deserialize($this->pagesource, TRUE);
 		$this->arrTags = $taglist->getTagList();
 		if ($this->tag_topten) $this->arrTopTenTags = $taglist->getTopTenTagList();
 		if (strlen(\TagHelper::decode(\Input::get('tag'))) && $this->tag_related)

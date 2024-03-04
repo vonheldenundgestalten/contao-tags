@@ -1,6 +1,9 @@
 <?php
 
 namespace Contao;
+use Contao\StringUtil;
+use Contao\System; 
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -30,7 +33,8 @@ class ModuleTagScope extends \Module
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		if ($isBackend)
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
 			$objTemplate->wildcard = '### TAGSCOPE ###';

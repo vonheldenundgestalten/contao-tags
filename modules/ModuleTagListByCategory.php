@@ -1,7 +1,9 @@
 <?php
 
 namespace Contao;
-
+use Contao\StringUtil;
+use Contao\System; 
+use Symfony\Component\HttpFoundation\Request;
 /**
  * Contao Open Source CMS - tags extension
  *
@@ -29,14 +31,15 @@ class ModuleTagListByCategory extends \Module
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		if ($isBackend)
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
 			$objTemplate->wildcard = '### Tag List by Category ###';
 
 			return $objTemplate->parse();
 		}
-		if (strlen($this->tag_sourcetables)) $this->sourcetables = deserialize($this->tag_sourcetables, TRUE);
+		if (strlen($this->tag_sourcetables)) $this->sourcetables = StringUtil::deserialize($this->tag_sourcetables, TRUE);
 		array_push($this->arrPages, $this->pagesource);
 		$this->getRelevantPages($this->pagesource);
 		return parent::generate();
@@ -169,10 +172,11 @@ class ModuleTagListByCategory extends \Module
 
 	protected function getNewsForNewsTags($tagids)
 	{
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
 		$time = time();
 		if (count($tagids))
 		{
-			$objArticles = $this->Database->prepare("SELECT *, author AS authorId, (SELECT title FROM tl_news_archive WHERE tl_news_archive.id=tl_news.pid) AS archive, (SELECT jumpTo FROM tl_news_archive WHERE tl_news_archive.id=tl_news.pid) AS parentJumpTo, (SELECT name FROM tl_user WHERE id=author) AS author FROM tl_news WHERE id IN (" . implode(",",$tagids) . ")" . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<$time) AND (stop='' OR stop>$time) AND published=1" : "") . " ORDER BY date DESC");
+			$objArticles = $this->Database->prepare("SELECT *, author AS authorId, (SELECT title FROM tl_news_archive WHERE tl_news_archive.id=tl_news.pid) AS archive, (SELECT jumpTo FROM tl_news_archive WHERE tl_news_archive.id=tl_news.pid) AS parentJumpTo, (SELECT name FROM tl_user WHERE id=author) AS author FROM tl_news WHERE id IN (" . implode(",",$tagids) . ")" . (!$hasBackendUser ? " AND (start='' OR start<$time) AND (stop='' OR stop>$time) AND published=1" : "") . " ORDER BY date DESC");
 
 			$objects = $objArticles->execute()->fetchAllAssoc();
 
@@ -195,10 +199,11 @@ class ModuleTagListByCategory extends \Module
 
 	protected function getEventsForEventTags($tagids)
 	{
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
 		$time = time();
 		if (count($tagids))
 		{
-			$objEvents = $this->Database->prepare("SELECT *, (SELECT name FROM tl_user WHERE id=author) author FROM tl_calendar_events WHERE id IN (" . implode(",",$tagids) . ") " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<$time) AND (stop='' OR stop>$time) AND published=1" : "") . " ORDER BY startTime")
+			$objEvents = $this->Database->prepare("SELECT *, (SELECT name FROM tl_user WHERE id=author) author FROM tl_calendar_events WHERE id IN (" . implode(",",$tagids) . ") " . (!$hasBackendUser ? " AND (start='' OR start<$time) AND (stop='' OR stop>$time) AND published=1" : "") . " ORDER BY startTime")
 										->execute($intStart, $intEnd, $intStart, $intEnd, $intStart, $intEnd, $intStart, $intEnd);
 			return $objEvents->fetchAllAssoc();
 		}
@@ -210,11 +215,12 @@ class ModuleTagListByCategory extends \Module
 
 	protected function getPagesForArticleTags($tags)
 	{
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
 		$pages = array();
 		if (count($this->arrPages) && count($tags))
 		{
 			$time = time();
-			$arrArticles = $this->Database->prepare("SELECT id FROM tl_article WHERE id IN (" . implode(',',$tags) . ") AND pid IN (" . implode(',',$this->arrPages) . ") " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
+			$arrArticles = $this->Database->prepare("SELECT id FROM tl_article WHERE id IN (" . implode(',',$tags) . ") AND pid IN (" . implode(',',$this->arrPages) . ") " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
 				->execute($time, $time)->fetchEach('id');
 			if (count($arrArticles))
 			{
@@ -227,11 +233,12 @@ class ModuleTagListByCategory extends \Module
 
 	protected function getArticlesForArticleTags($tags)
 	{
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
 		$articles = array();
 		if (count($this->arrPages) && count($tags))
 		{
 			$time = time();
-			$articles = $this->Database->prepare("SELECT DISTINCT id, tl_article.* FROM tl_article WHERE id IN (" . implode(',',$tags) . ") AND pid IN (" . implode(',',$this->arrPages) . ") " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
+			$articles = $this->Database->prepare("SELECT DISTINCT id, tl_article.* FROM tl_article WHERE id IN (" . implode(',',$tags) . ") AND pid IN (" . implode(',',$this->arrPages) . ") " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
 				->execute($time, $time)
 				->fetchAllAssoc();
 		}
@@ -240,15 +247,16 @@ class ModuleTagListByCategory extends \Module
 
 	protected function getPagesForContentTags($tags)
 	{
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
 		$pages = array();
 		if (count($this->arrPages) && count($tags))
 		{
 			$time = time();
-			$arrArticles = $this->Database->prepare("SELECT id FROM tl_article WHERE pid IN (" . implode(',',$this->arrPages) . ") " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
+			$arrArticles = $this->Database->prepare("SELECT id FROM tl_article WHERE pid IN (" . implode(',',$this->arrPages) . ") " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY sorting")
 				->execute($time, $time)->fetchEach('id');
 			if (count($arrArticles))
 			{
-				$arrContentElements = $this->Database->prepare("SELECT id FROM tl_content WHERE  id IN (" . implode(',',$tags) . ") AND pid IN (" . implode(',',$arrArticles) . ") " . (!BE_USER_LOGGED_IN ? " AND invisible<>1" : "") . " ORDER BY sorting")
+				$arrContentElements = $this->Database->prepare("SELECT id FROM tl_content WHERE  id IN (" . implode(',',$tags) . ") AND pid IN (" . implode(',',$arrArticles) . ") " . (!$hasBackendUser ? " AND invisible<>1" : "") . " ORDER BY sorting")
 					->execute()->fetchEach('id');
 				if (count($arrContentElements))
 				{

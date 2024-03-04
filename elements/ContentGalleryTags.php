@@ -1,7 +1,8 @@
 <?php
 
 namespace Contao;
-
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 /**
  * Contao Open Source CMS - tags extension
  *
@@ -81,7 +82,8 @@ class ContentGalleryTags extends ContentGallery
 	public static function addImageToTemplate($template, array $rowData, $maxWidth = null, $lightboxGroupIdentifier = null, FilesModel $filesModel = null): void
 	{
 		Controller::addImageToTemplate($template, $rowData, $maxWidth, $lightboxGroupIdentifier, $filesModel);
-		if (TL_MODE == 'FE') {
+		$isFrontend = System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		if ($isFrontend) {
 			$found = \TagModel::findByIdAndTable($rowData['id'], 'tl_files');
 			$tags = array();
 			if ($found && $found->count()) {

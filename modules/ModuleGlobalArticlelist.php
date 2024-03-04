@@ -1,7 +1,9 @@
 <?php
 
 namespace Contao;
-
+use Contao\System; 
+use Symfony\Component\HttpFoundation\Request;
+use Contao\StringUtil;
 /**
  * Contao Open Source CMS - tags extension
  *
@@ -28,7 +30,8 @@ class ModuleGlobalArticlelist extends \Module
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		if ($isBackend)
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
 			$objTemplate->wildcard = '### GLOBAL ARTICLE LIST ###';
@@ -47,6 +50,7 @@ class ModuleGlobalArticlelist extends \Module
 	protected function compile()
 	{
 		global $objPage;
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser(); 
 
 		// block this method to prevent recursive call of getArticle if the HTML of an article is the same as the current article
 		if ($this->block)
@@ -63,7 +67,7 @@ class ModuleGlobalArticlelist extends \Module
 		$time = time();
 
 		// Get published articles
-		$objArticles = $this->Database->prepare("SELECT id, title, inColumn, cssID FROM tl_article" . (!BE_USER_LOGGED_IN ? " WHERE (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY title")
+		$objArticles = $this->Database->prepare("SELECT id, title, inColumn, cssID FROM tl_article" . (!$hasBackendUser ? " WHERE (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY title")
 			->execute($time, $time);
 
 		$tagids = array();
@@ -84,7 +88,7 @@ class ModuleGlobalArticlelist extends \Module
 		}
 		while ($objArticles->next())
 		{
-			$cssID = deserialize($objArticles->cssID, true);
+			$cssID = StringUtil::deserialize($objArticles->cssID, true);
 
 			$objArticle = $this->Database->prepare("SELECT a.id AS aId, a.alias AS aAlias, a.title AS title, p.id AS id, p.alias AS alias, a.teaser FROM tl_article a, tl_page p WHERE a.pid=p.id AND (a.id=? OR a.alias=?)")
 										 ->limit(1)

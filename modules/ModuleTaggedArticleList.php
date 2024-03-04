@@ -1,7 +1,9 @@
 <?php
 
 namespace Contao;
-
+use Contao\StringUtil;
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 /**
  * @copyright  Helmut Schottmüller 2009-2013
  * @author     Helmut Schottmüller <https://github.com/hschottm>
@@ -37,7 +39,8 @@ class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		if ($isBackend)
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
 			$objTemplate->wildcard = '### TAGGED ARTICLE LIST ###';
@@ -67,6 +70,7 @@ class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
 
 	protected function getArticlesForPages()
 	{
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
 		$this->arrArticles = array();
 		if (count($this->arrPages))
 		{
@@ -106,12 +110,12 @@ class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
 
 			if ($this->show_in_column)
 			{
-				$objArticles = $this->Database->prepare("SELECT id, pid, title, alias, inColumn, cssID, teaser, start FROM tl_article WHERE inColumn = ? AND pid IN (" . $pids . ") " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . $order_by)
+				$objArticles = $this->Database->prepare("SELECT id, pid, title, alias, inColumn, cssID, teaser, start FROM tl_article WHERE inColumn = ? AND pid IN (" . $pids . ") " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . $order_by)
 											  ->execute($this->inColumn, $time, $time);
 			}
 			else
 			{
-				$objArticles = $this->Database->prepare("SELECT id, pid, title, alias, inColumn, cssID, teaser, start FROM tl_article WHERE pid IN (" . $pids . ") " . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . $order_by)
+				$objArticles = $this->Database->prepare("SELECT id, pid, title, alias, inColumn, cssID, teaser, start FROM tl_article WHERE pid IN (" . $pids . ") " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . $order_by)
 											  ->execute($time, $time);
 			}
 			if ($objArticles->numRows < 1)
@@ -132,7 +136,7 @@ class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
 				}
 				*/
 
-				$objArticles->cssID = deserialize($objArticles->cssID, true);
+				$objArticles->cssID = StringUtil::deserialize($objArticles->cssID, true);
 				// ??? $alias = strlen($objArticles->alias) ? $objArticles->alias : $objArticles->title;
 				$objArticles->startDate = (intval($objArticles->start) > 0) ? $this->parseDate($GLOBALS['TL_CONFIG']['datimFormat'], intval($objArticles->start)) : '';
 				$objArticles->teaser = $this->replaceInsertTags($objArticles->teaser);
@@ -186,7 +190,7 @@ class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
 
 		$time = time();
 
-		if (strlen($this->tag_articles)) $arrArticles = deserialize($this->tag_articles, TRUE);
+		if (strlen($this->tag_articles)) $arrArticles = StringUtil::deserialize($this->tag_articles, TRUE);
 		array_push($this->arrPages, $arrArticles[0]);
 		$this->getRelevantPages($arrArticles[0]);
 		$this->getArticlesForPages();
@@ -247,8 +251,8 @@ class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
 						$tags = $this->getTags($arrArticle['id']);
 						foreach ($tags as $id => $tag)
 						{
-							$strUrl = ampersand($this->generateFrontendUrl($pageArr, $items . '/tag/' . \TagHelper::encode($tag)));
-							$tags[$id] = '<a href="' . $strUrl . '">' . specialchars($tag) . '</a>';
+							$strUrl = StringUtil::ampersand($this->generateFrontendUrl($pageArr, $items . '/tag/' . \TagHelper::encode($tag)));
+							$tags[$id] = '<a href="' . $strUrl . '">' . StringUtil::specialchars($tag) . '</a>';
 						}
 						$objTemplate->tags = $tags;
 						$taglist = $objTemplate->parse();

@@ -9,6 +9,8 @@
  */
 
 namespace Contao;
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 
 class ContentHeadlineTags extends \ContentHeadline
 {
@@ -18,8 +20,15 @@ class ContentHeadlineTags extends \ContentHeadline
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'FE') if ($this->tagsonly) if (!strlen(\TagHelper::decode(\Input::get('tag')))) return;
-		return parent::generate();
+		$isFrontend = System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		if ($isFrontend) {
+            if ($this->tagsonly) {
+                if (!strlen(\TagHelper::decode(\Input::get('tag')))) {
+                    return;
+                }
+            }
+        }
+
+        return parent::generate();
 	}
 }
-

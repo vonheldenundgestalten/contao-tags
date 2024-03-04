@@ -1,7 +1,9 @@
 <?php
 
 namespace Contao;
-
+use Contao\StringUtil;
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 /**
  * @copyright  Helmut Schottmüller 2008-2013
  * @author     Helmut Schottmüller <https://github.com/hschottm>
@@ -26,7 +28,8 @@ class ModuleTagCloudNews extends \ModuleTagCloud
 	 */
 	public function generate()
 	{
-		if (TL_MODE == 'BE')
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		if ($isBackend)
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
 			$objTemplate->wildcard = '### TAGCLOUD NEWS ###';
@@ -40,7 +43,7 @@ class ModuleTagCloudNews extends \ModuleTagCloud
 		$taglist->addNamedClass = $this->tag_named_class;
 		if (strlen($this->tag_maxtags)) $taglist->maxtags = $this->tag_maxtags;
 		if (strlen($this->tag_buckets) && $this->tag_buckets > 0) $taglist->buckets = $this->tag_buckets;
-		if (strlen($this->tag_news_archives)) $taglist->newsarchives = deserialize($this->tag_news_archives, TRUE);
+		if (strlen($this->tag_news_archives)) $taglist->newsarchives = StringUtil::deserialize($this->tag_news_archives, TRUE);
 		$this->arrTags = $taglist->getTagList();
 		if ($this->tag_topten) $this->arrTopTenTags = $taglist->getTopTenTagList();
 		if (strlen($this->tag_topten_number) && $this->tag_topten_number > 0) $taglist->topnumber = $this->tag_topten_number;

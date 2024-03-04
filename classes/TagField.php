@@ -1,6 +1,7 @@
 <?php
 
 namespace Contao;
+use Contao\StringUtil;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -28,7 +29,7 @@ class TagField extends \TextField
 			$this->import('Database');
 			$this->Database->prepare("DELETE FROM tl_tag WHERE from_table = ? AND tid = ?")
 				->execute($this->table, $this->activeRecord->id);
-			$tags = array_filter(trimsplit(",", $value), 'strlen');
+			$tags = array_filter(StringUtil::trimsplit(",", $value), 'strlen');
 			foreach ($tags as $tag)
 			{
 				$this->Database->prepare("INSERT INTO tl_tag (tid, tag, from_table) VALUES (?, ?, ?)")
@@ -70,7 +71,7 @@ class TagField extends \TextField
 				$this->strTagTable = $varValue;
 				break;
 			case 'value':
-				$this->varValue = implode(",", array_filter(trimsplit(",", $varValue), 'strlen'));
+				$this->varValue = implode(",", array_filter(StringUtil::trimsplit(",", $varValue), 'strlen'));
 				break;
 			case 'maxtags':
 				$this->intMaxTags = $varValue;
@@ -129,7 +130,7 @@ class TagField extends \TextField
 						$this->strName,
 						$this->strId,
 						(strlen($this->strClass) ? ' ' . $this->strClass : ''),
-						specialchars($value),
+						StringUtil::specialchars($value),
 						$this->getAttributes());
 	}
 
@@ -138,8 +139,8 @@ class TagField extends \TextField
 	 */
 	public function validate()
 	{
-		$varInput = $this->validator(deserialize($this->getPost($this->strName)));
-		$this->saveTags(implode(",", array_filter(trimsplit(",", $varInput), 'strlen')));
+		$varInput = $this->validator(StringUtil::deserialize($this->getPost($this->strName)));
+		$this->saveTags(implode(",", array_filter(StringUtil::trimsplit(",", $varInput), 'strlen')));
 		parent::validate();
 	}
 }

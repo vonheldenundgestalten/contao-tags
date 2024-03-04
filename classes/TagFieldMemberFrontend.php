@@ -9,6 +9,8 @@
  */
 
 namespace Contao;
+use Contao\StringUtil;
+use Contao\ArrayUtil;
 
 /**
  * Class TagFieldFrontend
@@ -18,7 +20,7 @@ namespace Contao;
  * @author     Helmut Schottmüller <https://github.com/hschottm/tags_members>
  * @package    Controller
  */
-class TagFieldMemberFrontend extends \FormTextField
+class TagFieldMemberFrontend extends \FormText
 {
 	protected $blnSubmitInput = true;
 	protected $strTagTable = "";
@@ -37,7 +39,7 @@ class TagFieldMemberFrontend extends \FormTextField
 			$this->import('Database');
 			$this->Database->prepare("DELETE FROM tl_tag WHERE from_table = ? AND tid = ?")
 				->execute('tl_member', $this->User->id);
-			$tags = array_filter(trimsplit(",", $value), 'strlen');
+			$tags = array_filter(StringUtil::trimsplit(",", $value), 'strlen');
 			foreach ($tags as $tag)
 			{
 				$this->Database->prepare("INSERT INTO tl_tag (tid, tag, from_table) VALUES (?, ?, ?)")
@@ -75,7 +77,7 @@ class TagFieldMemberFrontend extends \FormTextField
 				$this->strTagTable = $varValue;
 				break;
 			case 'value':
-				$this->varValue = implode(",", array_filter(trimsplit(",", $varValue), 'strlen'));
+				$this->varValue = implode(",", array_filter(StringUtil::trimsplit(",", $varValue), 'strlen'));
 				break;
 			case 'maxtags':
 				$this->intMaxTags = $varValue;
@@ -123,7 +125,7 @@ class TagFieldMemberFrontend extends \FormTextField
 		 */
 		if (is_array($GLOBALS['TL_JAVASCRIPT']))
 		{
-			array_insert($GLOBALS['TL_JAVASCRIPT'], 1, 'system/modules/tags/assets/tag.js');
+			ArrayUtil::arrayInsert($GLOBALS['TL_JAVASCRIPT'], 1, 'system/modules/tags/assets/tag.js');
 		}
 		else
 		{
@@ -147,7 +149,7 @@ class TagFieldMemberFrontend extends \FormTextField
 						$this->strId,
 						($this->hideInput ? ' password' : ''),
 						(($this->strClass != '') ? ' ' . $this->strClass : ''),
-						specialchars($this->value),
+						StringUtil::specialchars($this->value),
 						$this->getAttributes(),
 						$this->strTagEnding) . $this->addSubmit();
 	}
@@ -157,8 +159,8 @@ class TagFieldMemberFrontend extends \FormTextField
 	 */
 	public function validate()
 	{
-		$varInput = $this->validator(deserialize($this->getPost($this->strName)));
-		$this->saveTags(implode(",", array_filter(trimsplit(",", $varInput), 'strlen')));
+		$varInput = $this->validator(StringUtil::deserialize($this->getPost($this->strName)));
+		$this->saveTags(implode(",", array_filter(StringUtil::trimsplit(",", $varInput), 'strlen')));
 		parent::validate();
 	}
 }

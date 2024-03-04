@@ -7,6 +7,7 @@
  *
  * @license LGPL-3.0+
  */
+use Contao\StringUtil;
 
 class tl_article_tags extends \Backend
 {
@@ -61,7 +62,7 @@ class tl_article_tags extends \Backend
  */
 
 if (isset($GLOBALS['TL_CONFIG']['disabledTagObjects'])) {
-	$disabledObjects = deserialize($GLOBALS['TL_CONFIG']['disabledTagObjects'], true);
+	$disabledObjects = StringUtil::deserialize($GLOBALS['TL_CONFIG']['disabledTagObjects'], true);
 } else {
 	$disabledObjects = array();
 }

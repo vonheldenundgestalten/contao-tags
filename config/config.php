@@ -1,5 +1,7 @@
 <?php
-
+use Contao\ArrayUtil;
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 /**
  * Contao Open Source CMS - tags extension
  *
@@ -16,7 +18,7 @@ $GLOBALS['BE_FFL']['tag'] = 'TagField';
 /**
  * Front end modules
  */
-array_insert($GLOBALS['FE_MOD']['tags'], 1, array
+ArrayUtil::arrayInsert($GLOBALS['FE_MOD']['tags'], 1, array
 (
 	'tagcloud'            => 'ModuleTagCloud',
   'tagcloudarticles'    => 'ModuleTagCloudArticles',
@@ -29,7 +31,7 @@ array_insert($GLOBALS['FE_MOD']['tags'], 1, array
   'tagcloudmembers'     => 'ModuleTagCloudMembers',
   'tagcloudnews'        => 'ModuleTagCloudNews'
 ));
-array_insert($GLOBALS['FE_MOD']['miscellaneous'], 3, array
+ArrayUtil::arrayInsert($GLOBALS['FE_MOD']['miscellaneous'], 3, array
 (
 	'globalArticleList'    => 'ModuleGlobalArticlelist'
 ));
@@ -53,8 +55,8 @@ if (array_key_exists('last_events', $GLOBALS['FE_MOD']['events']))
 	*/
 $GLOBALS['TL_CTE']['texts']['headline'] = 'ContentHeadlineTags';
 $GLOBALS['TL_CTE']['media']['gallery'] = 'ContentGalleryTags';
-
-if (TL_MODE == 'BE')
+$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+if ($isBackend)
 {
 	/**
 	 * CSS files
@@ -62,7 +64,7 @@ if (TL_MODE == 'BE')
 
     if (isset($GLOBALS['TL_CSS']) && \is_array($GLOBALS['TL_CSS']))
 	{
-		array_insert($GLOBALS['TL_CSS'], 1, 'system/modules/tags/assets/tag.css');
+		ArrayUtil::arrayInsert($GLOBALS['TL_CSS'], 1, 'system/modules/tags/assets/tag.css');
 	}
 	else
 	{
@@ -74,7 +76,7 @@ if (TL_MODE == 'BE')
 	 */
     if (isset($GLOBALS['TL_JAVASCRIPT']) && \is_array($GLOBALS['TL_JAVASCRIPT']))
     {
-        \array_insert($GLOBALS['TL_JAVASCRIPT'], 1, 'system/modules/tags/assets/tag.js');
+        ArrayUtil::arrayInsert($GLOBALS['TL_JAVASCRIPT'], 1, 'system/modules/tags/assets/tag.js');
     }
     else
     {

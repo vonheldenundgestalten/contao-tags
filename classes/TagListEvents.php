@@ -1,7 +1,8 @@
 <?php
 
 namespace Contao;
-
+use Contao\System; 
+use Symfony\Component\HttpFoundation\Request;
 /**
  * Class TagListEvents
  *
@@ -16,10 +17,12 @@ class TagListEvents extends TagList
 
   public function getRelatedTagList($for_tags, $blnExcludeUnpublishedItems = true)
 	{
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser(); 
 		if (!is_array($for_tags)) return array();
 		if (!count($this->arrCalendars)) return array();
 
-    if (TL_MODE == 'BE')
+    if ($isBackend)
 		{
 			$blnExcludeUnpublishedItems = false;
 		}
@@ -27,7 +30,7 @@ class TagListEvents extends TagList
 		$ids = array();
 		for ($i = 0; $i < count($for_tags); $i++)
 		{
-			$arr = $this->Database->prepare("SELECT DISTINCT tl_tag.tid FROM tl_tag, tl_calendar_events WHERE tl_tag.tid = tl_calendar_events.id AND tl_calendar_events.pid IN ('" . implode("','", $this->arrCalendars) . "') AND from_table = ? AND tag = ?" . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY tl_tag.tid ASC")
+			$arr = $this->Database->prepare("SELECT DISTINCT tl_tag.tid FROM tl_tag, tl_calendar_events WHERE tl_tag.tid = tl_calendar_events.id AND tl_calendar_events.pid IN ('" . implode("','", $this->arrCalendars) . "') AND from_table = ? AND tag = ?" . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY tl_tag.tid ASC")
 				->execute(array('tl_calendar_events', $for_tags[$i], time(), time()))
 				->fetchEach('tid');
 			if ($i == 0)
@@ -43,7 +46,7 @@ class TagListEvents extends TagList
 		$arrCloudTags = array();
 		if (count($ids))
 		{
-			$objTags = $this->Database->prepare("SELECT tag, COUNT(tag) as count FROM tl_tag, tl_calendar_events WHERE tl_tag.tid = tl_calendar_events.id AND tl_calendar_events.pid IN ('" . implode("','", $this->arrCalendars) . "') AND from_table = ? AND tl_tag.tid IN (" . implode(",", $ids) . ")" . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " GROUP BY tag ORDER BY tag ASC")
+			$objTags = $this->Database->prepare("SELECT tag, COUNT(tag) as count FROM tl_tag, tl_calendar_events WHERE tl_tag.tid = tl_calendar_events.id AND tl_calendar_events.pid IN ('" . implode("','", $this->arrCalendars) . "') AND from_table = ? AND tl_tag.tid IN (" . implode(",", $ids) . ")" . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " GROUP BY tag ORDER BY tag ASC")
 				->execute('tl_calendar_events', time(), time());
 			$list = "";
 			$tags = array();
@@ -53,7 +56,7 @@ class TagListEvents extends TagList
 				{
 					if (!in_array($objTags->tag, $for_tags))
 					{
-						$count = count($this->Database->prepare("SELECT tl_tag.tid FROM tl_tag, tl_calendar_events WHERE tl_tag.tid = tl_calendar_events.id AND tl_calendar_events.pid IN ('" . implode("','", $this->arrCalendars) . "') AND tag = ? AND from_table = ?" . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " AND tl_tag.tid IN (" . implode(",", $ids) . ")")
+						$count = count($this->Database->prepare("SELECT tl_tag.tid FROM tl_tag, tl_calendar_events WHERE tl_tag.tid = tl_calendar_events.id AND tl_calendar_events.pid IN ('" . implode("','", $this->arrCalendars) . "') AND tag = ? AND from_table = ?" . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " AND tl_tag.tid IN (" . implode(",", $ids) . ")")
 							->execute($objTags->tag, 'tl_calendar_events', time(), time())
 							->fetchAllAssoc());
 						array_push($tags, array('tag_name' => $objTags->tag, 'tag_count' => $count));
@@ -70,11 +73,12 @@ class TagListEvents extends TagList
 
   public function getTagList($blnExcludeUnpublishedItems = true)
 	{
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser(); 
 		if (count($this->arrCloudTags) == 0)
 		{
 			if (count($this->arrCalendars))
 			{
-				$objTags = $this->Database->prepare("SELECT tag, COUNT(tag) as count FROM tl_tag, tl_calendar_events WHERE tl_tag.tid = tl_calendar_events.id AND tl_calendar_events.pid IN ('" . implode("','", $this->arrCalendars) . "') AND from_table = ?" . (!BE_USER_LOGGED_IN ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " GROUP BY tag ORDER BY tag ASC")
+				$objTags = $this->Database->prepare("SELECT tag, COUNT(tag) as count FROM tl_tag, tl_calendar_events WHERE tl_tag.tid = tl_calendar_events.id AND tl_calendar_events.pid IN ('" . implode("','", $this->arrCalendars) . "') AND from_table = ?" . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " GROUP BY tag ORDER BY tag ASC")
 					->execute('tl_calendar_events', time(), time());
 				$list = "";
 				$tags = array();

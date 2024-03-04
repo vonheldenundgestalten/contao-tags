@@ -7,6 +7,7 @@
  *
  * @license LGPL-3.0+
  */
+use Contao\StringUtil;
 
 if (@class_exists("tl_news"))
 {
@@ -49,7 +50,7 @@ class tl_news_tags extends \Backend
  * Change tl_news palettes
  */
 if (isset($GLOBALS['TL_CONFIG']['disabledTagObjects'])) {
-	$disabledObjects = deserialize($GLOBALS['TL_CONFIG']['disabledTagObjects'], true);
+	$disabledObjects = StringUtil::deserialize($GLOBALS['TL_CONFIG']['disabledTagObjects'], true);
 } else {
 	$disabledObjects = array();
 }

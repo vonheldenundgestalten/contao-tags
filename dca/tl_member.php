@@ -7,6 +7,7 @@
  * @license    LGPL
  * @filesource
  */
+use Contao\StringUtil;
 
 class tl_member_tags extends \Backend
 {
@@ -33,7 +34,7 @@ class tl_member_tags extends \Backend
  * Change tl_member palettes
  */
 if (isset($GLOBALS['TL_CONFIG']['disabledTagObjects'])) {
-	$disabledObjects = deserialize($GLOBALS['TL_CONFIG']['disabledTagObjects'], true);
+	$disabledObjects = StringUtil::deserialize($GLOBALS['TL_CONFIG']['disabledTagObjects'], true);
 } else {
 	$disabledObjects = array();
 }
