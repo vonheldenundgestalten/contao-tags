@@ -17,14 +17,14 @@
   ],
   "require":{
     "php": "^8.0",
-    "contao/core-bundle": "^5.3",
+    "contao/core-bundle": "^5.3"
   },
   "autoload": {
     "classmap": [
-      "system/modules/tags/classes",
-      "system/modules/tags/elements",
-      "system/modules/tags/models",
-      "system/modules/tags/modules"
+      "classes/",
+      "elements/",
+      "models/",
+      "modules/"
     ]
   }
 }

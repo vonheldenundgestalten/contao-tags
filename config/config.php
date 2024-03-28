@@ -118,20 +118,20 @@ $GLOBALS['tags']['showInFeeds'] = true;
 $GLOBALS['TL_FFL']['tag'] = 'TagFieldMemberFrontend';
 
 
-
-if (is_array($GLOBALS['TL_CRON']['daily']))
-{
-	foreach ($GLOBALS['TL_CRON']['daily'] as $key => $arr)
-	{
-		if (is_array($arr) && strcmp($arr[0], 'Calendar') == 0 && strcmp($arr[1], 'generateFeeds') == 0)
-		{
-			// Fix calendar feed cron job
-			$GLOBALS['TL_CRON']['daily'][$key] = array('CalendarTags', 'generateFeeds');
-		}
-		if (is_array($arr) && strcmp($arr[0], 'News') == 0 && strcmp($arr[1], 'generateFeeds') == 0)
-		{
-			// Fix news feed cron job
-			$GLOBALS['TL_CRON']['daily'][$key] = array('NewsTags', 'generateFeeds');
-		}
-	}
-}
+//TO BE REMOVED, WE DON'T NEED CRON JOBS FOR OUR USE CASE
+// if (is_array($GLOBALS['TL_CRON']['daily']))
+// {
+// 	foreach ($GLOBALS['TL_CRON']['daily'] as $key => $arr)
+// 	{
+// 		if (is_array($arr) && strcmp($arr[0], 'Calendar') == 0 && strcmp($arr[1], 'generateFeeds') == 0)
+// 		{
+// 			// Fix calendar feed cron job
+// 			$GLOBALS['TL_CRON']['daily'][$key] = array('CalendarTags', 'generateFeeds');
+// 		}
+// 		if (is_array($arr) && strcmp($arr[0], 'News') == 0 && strcmp($arr[1], 'generateFeeds') == 0)
+// 		{
+// 			// Fix news feed cron job
+// 			$GLOBALS['TL_CRON']['daily'][$key] = array('NewsTags', 'generateFeeds');
+// 		}
+// 	}
+// }
