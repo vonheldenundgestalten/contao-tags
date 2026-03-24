@@ -83,7 +83,7 @@ class TagList extends System
 					$values[] = $for_tags[$i];
 				}
 				$arr = $this->Database->prepare(implode(" UNION ", $arrSql))
-					->execute($values)
+					->execute(...$values)
 					->fetchEach('tid');
 				if ($i == 0)
 				{
@@ -166,7 +166,7 @@ class TagList extends System
 								array_push($keys, 'from_table = ?');
 							}
 							$count = count($this->Database->prepare("SELECT tid FROM $tagtable WHERE $tagfield = ? AND (" . implode(" OR ", $keys) . ") AND tid IN (" . implode(",", $ids) . ")")
-								->execute(array_merge(array($objTags->tag), $this->forTable))
+								->execute(...array_merge(array($objTags->tag), $this->forTable))
 								->fetchAllAssoc());
 						}
 						else

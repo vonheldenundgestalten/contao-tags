@@ -34,7 +34,7 @@ class ModuleNewsArchiveTags extends ModuleNewsArchive
 			}
 			array_push($tags, 'tl_news');
 			return $this->Database->prepare("SELECT tid FROM tl_tag WHERE tag IN (" . implode(',', $placeholders) . ") AND from_table = ? ORDER BY tag ASC")
-				->execute($tags)
+				->execute(...$tags)
 				->fetchEach('tid');
 		}
 		else

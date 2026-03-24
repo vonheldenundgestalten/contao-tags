@@ -507,7 +507,7 @@ class ModuleEventlistTags extends ModuleEventlist
 			}
 			array_push($tags, 'tl_calendar_events');
 			return $this->Database->prepare("SELECT tid FROM tl_tag WHERE tag IN (" . implode(',', $placeholders) . ") AND from_table = ? ORDER BY tag ASC")
-				->execute($tags)
+				->execute(...$tags)
 				->fetchEach('tid');
 		}
 		else

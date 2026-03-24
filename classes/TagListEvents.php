@@ -32,7 +32,7 @@ class TagListEvents extends TagList
 		for ($i = 0; $i < count($for_tags); $i++)
 		{
 			$arr = $this->Database->prepare("SELECT DISTINCT tl_tag.tid FROM tl_tag, tl_calendar_events WHERE tl_tag.tid = tl_calendar_events.id AND tl_calendar_events.pid IN ('" . implode("','", $this->arrCalendars) . "') AND from_table = ? AND tag = ?" . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY tl_tag.tid ASC")
-				->execute(array('tl_calendar_events', $for_tags[$i], time(), time()))
+				->execute('tl_calendar_events', $for_tags[$i], time(), time())
 				->fetchEach('tid');
 			if ($i == 0)
 			{

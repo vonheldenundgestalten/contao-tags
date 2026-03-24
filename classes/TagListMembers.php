@@ -39,7 +39,7 @@ class TagListMembers extends TagList
 		for ($i = 0; $i < count($for_tags); $i++)
 		{
 			$arr = $this->Database->prepare("SELECT DISTINCT tl_tag.tid FROM tl_tag, tl_member WHERE tl_tag.tid = tl_member.id AND from_table = ? AND tag = ? ORDER BY tl_tag.tid ASC")
-				->execute(array('tl_member', $for_tags[$i]))
+				->execute('tl_member', $for_tags[$i])
 				->fetchEach('tid');
 			if ($i == 0)
 			{

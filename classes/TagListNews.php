@@ -33,7 +33,7 @@ class TagListNews extends TagList
 		for ($i = 0; $i < count($for_tags); $i++)
 		{
 			$arr = $this->Database->prepare("SELECT DISTINCT tl_tag.tid FROM tl_tag, tl_news WHERE tl_tag.tid = tl_news.id AND tl_news.pid IN ('" . implode("','", $this->arrNewsarchives) . "') AND from_table = ? AND tag = ? " . (!$hasBackendUser ? " AND (start='' OR start<?) AND (stop='' OR stop>?) AND published=1" : "") . " ORDER BY tl_tag.tid ASC")
-				->execute(array('tl_news', $for_tags[$i], time(), time()))
+				->execute('tl_news', $for_tags[$i], time(), time())
 				->fetchEach('tid');
 			if ($i == 0)
 			{

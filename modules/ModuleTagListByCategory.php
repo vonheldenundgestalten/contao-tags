@@ -82,7 +82,7 @@ class ModuleTagListByCategory extends Module
 					if (count($tagids))
 					{
 						$found = $this->Database->prepare("SELECT tid, from_table FROM tl_tag WHERE from_table IN (" . implode(',', $marks) . ") AND tag = ? AND tid IN (" . implode(",",$tagids) . ")")
-							->execute(array_merge($this->sourcetables, array($tag)))
+							->execute(...array_merge($this->sourcetables, array($tag)))
 							->fetchAllAssoc();
 						foreach ($found as $data)
 						{
@@ -94,7 +94,7 @@ class ModuleTagListByCategory extends Module
 					else if ($first)
 					{
 						$found = $this->Database->prepare("SELECT tid, from_table FROM tl_tag WHERE from_table IN (" . implode(',', $marks) . ") AND tag = ?")
-							->execute(array_merge($this->sourcetables, array($tag)))
+							->execute(...array_merge($this->sourcetables, array($tag)))
 							->fetchAllAssoc();
 						foreach ($found as $data)
 						{

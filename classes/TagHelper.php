@@ -348,7 +348,7 @@ class TagHelper extends Backend
 				$pageArr = array();
 				$objFoundPage = $this->Database->prepare("SELECT id, alias FROM tl_page WHERE id=? OR alias=?")
 					->limit(1)
-					->execute(array($target, $target));
+					->execute($target, $target);
 				$pageArr = ($objFoundPage->numRows) ? $objFoundPage->fetchAssoc() : array();
 				if (count($pageArr))
 				{
