@@ -1,6 +1,11 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Input;
+use Contao\ModuleFaqList;
+use Contao\StringUtil;
+use Contao\System;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -10,7 +15,7 @@ namespace Contao;
  * @license LGPL-3.0+
  */
 
-class ModuleFaqListTags extends \ModuleFaqList
+class ModuleFaqListTags extends ModuleFaqList
 {
 
 	/**
@@ -19,10 +24,10 @@ class ModuleFaqListTags extends \ModuleFaqList
 	protected function compile()
 	{
 		$tagids = array();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$alltags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$alltags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 			$first = true;
 			foreach ($alltags as $tag)
 			{
@@ -50,7 +55,7 @@ class ModuleFaqListTags extends \ModuleFaqList
 			}
 		}
 
-		$objFaq = \TagsFaqModel::findPublishedByPidsAndIds($this->faq_categories, $tagids);
+		$objFaq = TagsFaqModel::findPublishedByPidsAndIds($this->faq_categories, $tagids);
 
 		if ($objFaq === null)
 		{

@@ -1,6 +1,10 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\BackendTemplate;
+use Contao\FrontendTemplate;
+use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @author     Helmut Schottmüller <https://github.com/hschottm>
  * @package    Controller
  */
-class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
+class ModuleTaggedArticleList extends ModuleGlobalArticlelist
 {
 	/**
 	 * Template
@@ -197,8 +201,8 @@ class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
 
 		$tagids = array();
 
-		$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-		$alltags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+		$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+		$alltags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 		$first = true;
 		foreach ($alltags as $tag)
 		{
@@ -251,7 +255,7 @@ class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
 						$tags = $this->getTags($arrArticle['id']);
 						foreach ($tags as $id => $tag)
 						{
-							$strUrl = StringUtil::ampersand($this->generateFrontendUrl($pageArr, $items . '/tag/' . \TagHelper::encode($tag)));
+							$strUrl = StringUtil::ampersand($this->generateFrontendUrl($pageArr, $items . '/tag/' . TagHelper::encode($tag)));
 							$tags[$id] = '<a href="' . $strUrl . '">' . StringUtil::specialchars($tag) . '</a>';
 						}
 						$objTemplate->tags = $tags;
@@ -271,10 +275,10 @@ class ModuleTaggedArticleList extends \ModuleGlobalArticlelist
 		}
 
 		$headlinetags = array();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$headlinetags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$headlinetags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 		}
 		$this->Template->showTags = $this->article_showtags;
 		$this->Template->tags_activetags = $headlinetags;

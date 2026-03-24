@@ -1,6 +1,8 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\ModuleNewsReader;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -10,7 +12,7 @@ namespace Contao;
  * @license LGPL-3.0+
  */
 
-class ModuleNewsReaderTags extends \ModuleNewsReader
+class ModuleNewsReaderTags extends ModuleNewsReader
 {
 	/**
 	 * Parse one or more items and return them as array
@@ -20,9 +22,9 @@ class ModuleNewsReaderTags extends \ModuleNewsReader
 	 */
 	protected function compile()
 	{
-		\TagHelper::$config['news_showtags'] = $this->news_showtags;
-		\TagHelper::$config['news_jumpto'] = $this->tag_jumpTo;
-		\TagHelper::$config['news_tag_named_class'] = $this->tag_named_class;
+		TagHelper::$config['news_showtags'] = $this->news_showtags;
+		TagHelper::$config['news_jumpto'] = $this->tag_jumpTo;
+		TagHelper::$config['news_tag_named_class'] = $this->tag_named_class;
 		parent::compile();
 	}
 }

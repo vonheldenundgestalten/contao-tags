@@ -1,6 +1,11 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\ContentGallery;
+use Contao\Controller;
+use Contao\FilesModel;
+use Contao\Input;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 /**
@@ -20,11 +25,11 @@ class ContentGalleryTags extends ContentGallery
 	{
 		$newMultiSRC = array();
 
-		if ((strlen(\TagHelper::decode(Input::get('tag'))) && (!$this->tag_ignore)) || (strlen($this->tag_filter))) {
+		if ((strlen(TagHelper::decode(Input::get('tag'))) && (!$this->tag_ignore)) || (strlen($this->tag_filter))) {
 			$tagids = array();
 
-			$relatedlist = (strlen(\TagHelper::decode(Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(Input::get('related'))) : array();
-			$alltags = array_merge(array(\TagHelper::decode(Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$alltags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 			$first = true;
 			if (strlen($this->tag_filter)) {
 				$headlinetags = preg_split("/,/", $this->tag_filter);
@@ -84,7 +89,7 @@ class ContentGalleryTags extends ContentGallery
 		Controller::addImageToTemplate($template, $rowData, $maxWidth, $lightboxGroupIdentifier, $filesModel);
 		$isFrontend = System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
 		if ($isFrontend) {
-			$found = \TagModel::findByIdAndTable($rowData['id'], 'tl_files');
+			$found = TagModel::findByIdAndTable($rowData['id'], 'tl_files');
 			$tags = array();
 			if ($found && $found->count()) {
 				while ($found->next()) {

@@ -7,17 +7,19 @@
  * @license    LGPL
  * @filesource
  */
+use Contao\Backend;
+use Contao\DataContainer;
 use Contao\StringUtil;
 
-class tl_member_tags extends \Backend
+class tl_member_tags extends Backend
 {
-	public function deleteMember(\DataContainer $dc, $undoId)
+	public function deleteMember(DataContainer $dc, $undoId)
 	{
 		$this->Database->prepare("DELETE FROM tl_tag WHERE from_table = ? AND tid = ?")
 			->execute($dc->table, $dc->id);
 	}
 
-	public function onCopy($insertID, \DataContainer $dc)
+	public function onCopy($insertID, DataContainer $dc)
 	{
 		$objTags = $this->Database->prepare("SELECT * FROM tl_tag WHERE tid = ? AND from_table = ?")->execute($dc->id, $dc->table);
 		$tags = array();

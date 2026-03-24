@@ -1,11 +1,27 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
 
+use Contao\ArticleModel;
+use Contao\Calendar;
+use Contao\CalendarEventsModel;
+use Contao\CalendarModel;
+use Contao\Comments;
+use Contao\ContentModel;
 use Contao\CoreBundle\Exception\InternalServerErrorException;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
+use Contao\Date;
+use Contao\Environment;
+use Contao\Events;
+use Contao\FrontendTemplate;
+use Contao\Input;
+use Contao\ModuleEventReader;
+use Contao\PageModel;
+use Contao\StringUtil;
+use Contao\System;
+use Contao\UserModel;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -15,7 +31,7 @@ use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
  * @license LGPL-3.0+
  */
 
-class ModuleEventReaderTags extends \ModuleEventReader
+class ModuleEventReaderTags extends ModuleEventReader
 {
 	/**
 	 * Return the date and time strings - COPIED from Contao ModuleEventReader
@@ -330,7 +346,7 @@ class ModuleEventReaderTags extends \ModuleEventReader
 		$objTemplate->showTags = $this->event_showtags;
 		if ($this->event_showtags)
 		{
-		$helper = new \TagHelper();
+		$helper = new TagHelper();
 		$tagsandlist = $helper->getTagsAndTaglistForIdAndTable($objEvent->id, 'tl_calendar_events', $this->tag_jumpTo);
 		$tags = $tagsandlist['tags'];
 		$taglist = $tagsandlist['taglist'];

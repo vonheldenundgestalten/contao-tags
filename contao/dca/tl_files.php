@@ -7,6 +7,8 @@
  *
  * @license LGPL-3.0+
  */
+use Contao\Backend;
+use Contao\DataContainer;
 use Contao\StringUtil;
 
 if (isset($GLOBALS['TL_CONFIG']['disabledTagObjects'])) {
@@ -38,9 +40,9 @@ $GLOBALS['TL_DCA']['tl_files']['fields']['tags'] = array
  * @author     Helmut Schottmüller <https://github.com/hschottm>
  * @package    Controller
  */
-class tl_files_tags extends \Backend
+class tl_files_tags extends Backend
 {
-	public function removeContentElement($source, \DataContainer $dc)
+	public function removeContentElement($source, DataContainer $dc)
 	{ 
         $fileModel = \FilesModel::findByPath($source);
 		if ($fileModel != null) {
@@ -49,7 +51,7 @@ class tl_files_tags extends \Backend
 		}
 	}
 
-    public function onCopy($source, $destination, \DataContainer $dc)
+    public function onCopy($source, $destination, DataContainer $dc)
     {
         $sourceModel = \FilesModel::findByPath($source);
         $destModel = \FilesModel::findByPath($destination);

@@ -1,6 +1,15 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\BackendTemplate;
+use Contao\Database;
+use Contao\Environment;
+use Contao\Input;
+use Contao\Module;
+use Contao\StringUtil;
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -9,11 +18,8 @@ namespace Contao;
  *
  * @license LGPL-3.0+
  */
-use Contao\System; 
-use Symfony\Component\HttpFoundation\Request;
-use Contao\StringUtil;
 
-class ModuleTagCloud extends \Module
+class ModuleTagCloud extends Module
 {
 	/**
 	 * Template
@@ -30,14 +36,15 @@ class ModuleTagCloud extends \Module
 	protected $arrRelated = array();
 	protected $checkForArticleOnPage = false;
 	protected $checkForContentElementOnPage = false;
+	protected $Database;
 
 	public static $tagCloudStates = array();
 
 	protected function toggleTagCloud()
 	{
-		if (\Input::post('toggleTagCloud') == 1)
+		if (Input::post('toggleTagCloud') == 1)
 		{
-			static::$tagCloudStates[\Input::post('cloudPageID')][\Input::post('cloudID')] = \Input::post('display');
+			static::$tagCloudStates[Input::post('cloudPageID')][Input::post('cloudID')] = Input::post('display');
 		}
 	}
 
@@ -69,10 +76,10 @@ class ModuleTagCloud extends \Module
 		if (strlen($this->pagesource)) $taglist->pagesource = StringUtil::deserialize($this->pagesource, TRUE);
 		$this->arrTags = $taglist->getTagList();
 		if ($this->tag_topten) $this->arrTopTenTags = $taglist->getTopTenTagList();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))) && $this->tag_related)
+		if (strlen(TagHelper::decode(Input::get('tag'))) && $this->tag_related)
 		{
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$this->arrRelated = $taglist->getRelatedTagList(array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist));
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$this->arrRelated = $taglist->getRelatedTagList(array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist));
 		}
 		if (count($this->arrTags) < 1)
 		{
@@ -87,6 +94,7 @@ class ModuleTagCloud extends \Module
 	 */
 	protected function compile()
 	{
+		$this->Database = Database::getInstance();
 		$this->showTags();
 	}
 
@@ -97,10 +105,10 @@ class ModuleTagCloud extends \Module
 	{
 		global $objPage;
 		$this->loadLanguageFile('tl_module');
-		$strUrl = StringUtil::ampersand(\Environment::get('request'));
+		$strUrl = StringUtil::ampersand(Environment::get('request'));
 		// Get target page
 
-		$pageObj = \TagHelper::getPageObj($this->tag_jumpTo);
+		$pageObj = TagHelper::getPageObj($this->tag_jumpTo);
 
 		// $default = ($objPage != null) ? $objPage->row() : array();
 		// $pageArr = ($objPageObject->numRows) ? $objPageObject->fetchAssoc() : $default;
@@ -108,16 +116,16 @@ class ModuleTagCloud extends \Module
 
 		if ($this->keep_url_params)
 		{
-			$strParams = \TagHelper::getSavedURLParams($this->Input);
+			$strParams = TagHelper::getSavedURLParams($this->Input);
 		}
 
-		$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
+		$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
 
 		foreach ($this->arrTags as $idx => $tag)
 		{
 			if (!empty($pageObj))
 			{
-				$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . \TagHelper::encode($tag['tag_name'])));
+				$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . TagHelper::encode($tag['tag_name'])));
 				if (strlen($strParams))
 				{
 					if (strpos($strUrl, '?') !== false)
@@ -131,7 +139,7 @@ class ModuleTagCloud extends \Module
 				}
 			}
 			$this->arrTags[$idx]['tag_url'] = $strUrl;
-			if ($tag['tag_name'] == \TagHelper::decode(\Input::get('tag')))
+			if ($tag['tag_name'] == TagHelper::decode(Input::get('tag')))
 			{
 				$this->arrTags[$idx]['tag_class'] .= ' active';
 			}
@@ -174,7 +182,7 @@ class ModuleTagCloud extends \Module
 			if (!empty($pageObj))
 			{
 				$allrelated = array_merge($relatedlist, array($tag['tag_name']));
-				$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . \TagHelper::encode(\TagHelper::decode(\Input::get('tag'))) . '/related/' . \TagHelper::encode(implode(',', $allrelated))));
+				$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . TagHelper::encode(TagHelper::decode(Input::get('tag'))) . '/related/' . TagHelper::encode(implode(',', $allrelated))));
 			}
 			$this->arrRelated[$idx]['tag_url'] = $strUrl;
 		}
@@ -186,7 +194,7 @@ class ModuleTagCloud extends \Module
 		$this->Template->strAllTags = $GLOBALS['TL_LANG']['tl_module']['tag_alltags'];
 		$this->Template->strTopTenTags = sprintf($GLOBALS['TL_LANG']['tl_module']['top_tags'], $this->tag_topten_number);
 		$this->Template->tagcount = count($this->arrTags);
-		$this->Template->selectedtags = (strlen(\TagHelper::decode(\Input::get('tag')))) ? (count($this->arrRelated)+1) : 0;
+		$this->Template->selectedtags = (strlen(TagHelper::decode(Input::get('tag')))) ? (count($this->arrRelated)+1) : 0;
 		if ($this->tag_show_reset)
 		{
 			$strEmptyUrl = StringUtil::ampersand($objPage->getFrontendUrl(''));
@@ -204,7 +212,7 @@ class ModuleTagCloud extends \Module
 			$this->Template->empty_url = $strEmptyUrl;
 			$this->Template->lngEmpty = $GLOBALS['TL_LANG']['tl_module']['tag_clear_tags'];
 		}
-		$GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/tags/assets/tagcloud.js';
+		$GLOBALS['TL_JAVASCRIPT'][] = 'bundles/contaotags/tagcloud.js';
 		if (!empty($pageObj))
 		{
 			$this->Template->topten = $this->tag_topten;
@@ -212,8 +220,8 @@ class ModuleTagCloud extends \Module
 			{
 				foreach ($this->arrTopTenTags as $idx => $tag)
 				{
-					$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . \TagHelper::encode($tag['tag_name'])));
-					if ($tag['tag_name'] == \TagHelper::decode(\Input::get('tag')))
+					$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . TagHelper::encode($tag['tag_name'])));
+					if ($tag['tag_name'] == TagHelper::decode(Input::get('tag')))
 					{
 						$this->arrTopTenTags[$idx]['tag_class'] .= ' active';
 					}
@@ -265,7 +273,6 @@ class ModuleTagCloud extends \Module
 				$this->checkForContentElementOnPage = $varValue;
 				break;
 			default:
-				parent::__set($strKey, $varValue);
 				break;
 		}
 	}
@@ -286,8 +293,7 @@ class ModuleTagCloud extends \Module
 				return $this->checkForContentElementOnPage;
 				break;
 			default:
-				return parent::__get($strKey);
-				break;
+				return null;
 		}
 	}
 }

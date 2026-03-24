@@ -1,6 +1,13 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Backend;
+use Contao\Database;
+use Contao\Environment;
+use Contao\FrontendTemplate;
+use Contao\Input;
+use Contao\PageModel;
 use Contao\StringUtil;
 
 /**
@@ -11,7 +18,7 @@ use Contao\StringUtil;
  * @license LGPL-3.0+
  */
 
-class TagHelper extends \Backend
+class TagHelper extends Backend
 {
     public static $config = array();
 	
@@ -21,7 +28,7 @@ class TagHelper extends \Backend
 	public function __construct()
 	{
 		parent::__construct();
-		$this->import('Database');
+		$this->Database = Database::getInstance();
 	}
 
 	public static function getPageObj($jumpTo = null)
@@ -231,8 +238,8 @@ class TagHelper extends \Backend
 		if ($strTag == 'tags_used')
 		{
 			$headlinetags = array();
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			if (strlen(\TagHelper::decode(\Input::get('tag'))))
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			if (strlen(TagHelper::decode(Input::get('tag'))))
 			{
 				$headlinetags = array_merge($headlinetags, array($this->Input->get('tag')));
 				if (count($relatedlist))
@@ -255,8 +262,8 @@ class TagHelper extends \Backend
 		{
 			case 'tags_used':
 				$headlinetags = array();
-				$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-				if (strlen(\TagHelper::decode(\Input::get('tag'))))
+				$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+				if (strlen(TagHelper::decode(Input::get('tag'))))
 				{
 					$headlinetags = array_merge($headlinetags, array($this->Input->get('tag')));
 					if (count($relatedlist))
@@ -330,7 +337,7 @@ class TagHelper extends \Backend
 			foreach ($arrTags as $idx => $tag)
 			{
 				$arrTags[$idx]['tagcount'] = $countarray[$tag['tag']];
-				$arrTags[$idx]['tag_class'] = \Contao\TagList::_getTagNameClass($tag['tag']);
+				$arrTags[$idx]['tag_class'] = TagList::_getTagNameClass($tag['tag']);
 			}
 			if ($relevance == 1)
 			{
@@ -347,7 +354,7 @@ class TagHelper extends \Backend
 				{
 					foreach ($arrTags as $idx => $tag)
 					{
-						$arrTags[$idx]['url'] = StringUtil::ampersand($objPage->getFrontendUrl('/tag/' . \TagHelper::encode($tag['tag'])));
+						$arrTags[$idx]['url'] = StringUtil::ampersand($objPage->getFrontendUrl('/tag/' . TagHelper::encode($tag['tag'])));
 					}
 				}
 			}
@@ -368,7 +375,7 @@ class TagHelper extends \Backend
 			$taglist = array();
 			foreach ($tags as $id => $tag)
 			{
-				$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . \TagHelper::encode($tag)));
+				$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . TagHelper::encode($tag)));
 				$tags[$id] = '<a href="' . $strUrl . '">' . StringUtil::specialchars($tag) . '</a>';
 				$taglist[$id] = array(
 					'url' => $tags[$id],
@@ -391,8 +398,8 @@ class TagHelper extends \Backend
 		$taglist = array();
 		foreach ($tags as $id => $tag)
 		{
-			$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . \TagHelper::encode($tag)));
-			if (strlen(\Environment::get('queryString'))) $strUrl .= "?" . \Environment::get('queryString');
+			$strUrl = StringUtil::ampersand($pageObj->getFrontendUrl('/tag/' . TagHelper::encode($tag)));
+			if (strlen(Environment::get('queryString'))) $strUrl .= "?" . Environment::get('queryString');
 			$tags[$id] = '<a href="' . $strUrl . '">' . StringUtil::specialchars($tag) . '</a>';
 			$taglist[$id] = array(
 				'url' => $tags[$id],

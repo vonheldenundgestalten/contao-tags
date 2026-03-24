@@ -1,6 +1,9 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Calendar;
+use Contao\FrontendTemplate;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -9,7 +12,7 @@ namespace Contao;
  *
  * @license LGPL-3.0+
  */
-class CalendarTags extends \Calendar
+class CalendarTags extends Calendar
 {
 	/**
 	 * Add an event to the array of active events
@@ -63,7 +66,7 @@ class CalendarTags extends \Calendar
 						}
 						else
 						{
-							$strUrl = \TagHelper::getPageObj()->getFrontendUrl('/articles/' . ((!$GLOBALS['TL_CONFIG']['disableAlias'] && strlen($objEvent->aAlias)) ? $objEvent->aAlias : $objEvent->aId));
+							$strUrl = TagHelper::getPageObj()->getFrontendUrl('/articles/' . ((!$GLOBALS['TL_CONFIG']['disableAlias'] && strlen($objEvent->aAlias)) ? $objEvent->aAlias : $objEvent->aId));
 						}
 						break;
 				}

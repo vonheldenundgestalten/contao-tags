@@ -8,10 +8,12 @@
  * @license LGPL-3.0+
  */
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\FaqModel;
 use Contao\System;
 
-class TagsFaqModel extends \FaqModel
+class TagsFaqModel extends FaqModel
 {
 	/**
 	 * Find all published FAQs by their parent IDs

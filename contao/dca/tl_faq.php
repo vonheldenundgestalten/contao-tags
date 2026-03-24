@@ -7,6 +7,8 @@
  *
  * @license LGPL-3.0+
  */
+use Contao\Backend;
+use Contao\DataContainer;
 use Contao\StringUtil;
 
 if (@class_exists("tl_faq"))
@@ -37,15 +39,15 @@ if (@class_exists("tl_faq"))
 		'sql'                     => "char(1) NOT NULL default ''"
 		);
 
-	class tl_faq_tags extends \Backend
+	class tl_faq_tags extends Backend
 	{
-		public function removeFAQ(\DataContainer $dc, $undoId)
+		public function removeFAQ(DataContainer $dc, $undoId)
 		{
 			$this->Database->prepare("DELETE FROM tl_tag WHERE from_table = ? AND tid = ?")
 				->execute($dc->table, $dc->id);
 		}
 
-		public function onCopy($insertID, \DataContainer $dc)
+		public function onCopy($insertID, DataContainer $dc)
 		{
 			$objTags = $this->Database->prepare("SELECT * FROM tl_tag WHERE tid = ? AND from_table = ?")->execute($dc->id, $dc->table);
 			$tags = array();

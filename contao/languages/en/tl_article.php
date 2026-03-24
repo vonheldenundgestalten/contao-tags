@@ -2,7 +2,6 @@
 use Contao\System;
 $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
-if (!defined($rootDir)) die('You can not access this file directly!');
 
 
 /**

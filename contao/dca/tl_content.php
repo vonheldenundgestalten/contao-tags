@@ -7,6 +7,8 @@
  *
  * @license LGPL-3.0+
  */
+use Contao\Backend;
+use Contao\DataContainer;
 use Contao\StringUtil;
 
 if (isset($GLOBALS['TL_CONFIG']['disabledTagObjects'])) {
@@ -77,15 +79,15 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['tag_ignore'] = array
  * @author     Helmut Schottmüller <https://github.com/hschottm>
  * @package    Controller
  */
-class tl_content_tags extends \Backend
+class tl_content_tags extends Backend
 {
-	public function removeContentElement(\DataContainer $dc, $undoId)
+	public function removeContentElement(DataContainer $dc, $undoId)
 	{
 		$this->Database->prepare("DELETE FROM tl_tag WHERE from_table = ? AND tid = ?")
 			->execute($dc->table, $dc->id);
 	}
 
-    public function onCopy($insertID, \DataContainer $dc)
+    public function onCopy($insertID, DataContainer $dc)
     {
 		$objTags = $this->Database->prepare("SELECT * FROM tl_tag WHERE tid = ? AND from_table = ?")->execute($dc->id, $dc->table);
 		$tags = array();

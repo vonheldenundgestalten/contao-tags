@@ -1,6 +1,12 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Config;
+use Contao\Input;
+use Contao\ModuleNewsList;
+use Contao\NewsModel;
+use Contao\Pagination;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -10,7 +16,7 @@ namespace Contao;
  * @license LGPL-3.0+
  */
 
-class ModuleNewsListTags extends \ModuleNewsList
+class ModuleNewsListTags extends ModuleNewsList
 {
 	/**
 	 * Display a wildcard in the back end
@@ -78,7 +84,7 @@ class ModuleNewsListTags extends \ModuleNewsList
 		$this->Template->empty = $GLOBALS['TL_LANG']['MSC']['emptyList'];
 
 		// Get the total number of items
-		$intTotal = \TagsNewsModel::countPublishedByPidsAndIds($this->news_archives, $arrIds, $blnFeatured);
+		$intTotal = TagsNewsModel::countPublishedByPidsAndIds($this->news_archives, $arrIds, $blnFeatured);
 
 		if ($intTotal < 1)
 		{
@@ -98,7 +104,7 @@ class ModuleNewsListTags extends \ModuleNewsList
 
 			// Get the current page
 			$id = 'page_n' . $this->id;
-			$page = (\Input::get($id) !== null) ? \Input::get($id) : 1;
+			$page = (Input::get($id) !== null) ? Input::get($id) : 1;
 
 			// Do not index or cache the page if the page number is outside the range
 			if ($page < 1 || $page > max(ceil($total/$this->perPage), 1))
@@ -123,7 +129,7 @@ class ModuleNewsListTags extends \ModuleNewsList
 			}
 
 			// Add the pagination menu
-			$objPagination = new \Pagination($total, $this->perPage, \Config::get('maxPaginationLinks'), $id);
+			$objPagination = new Pagination($total, $this->perPage, Config::get('maxPaginationLinks'), $id);
 			$this->Template->pagination = $objPagination->generate("\n  ");
 		}
 
@@ -161,11 +167,11 @@ class ModuleNewsListTags extends \ModuleNewsList
 		// Get the items
 		if (isset($limit))
 		{
-			$objArticles = \TagsNewsModel::findPublishedByPidsAndIds($this->news_archives, $arrIds, $blnFeatured, $limit, $offset, array('order'=>$order));
+			$objArticles = TagsNewsModel::findPublishedByPidsAndIds($this->news_archives, $arrIds, $blnFeatured, $limit, $offset, array('order'=>$order));
 		}
 		else
 		{
-			$objArticles = \TagsNewsModel::findPublishedByPidsAndIds($this->news_archives, $arrIds, $blnFeatured, 0, $offset, array('order'=>$order));
+			$objArticles = TagsNewsModel::findPublishedByPidsAndIds($this->news_archives, $arrIds, $blnFeatured, 0, $offset, array('order'=>$order));
 		}
 
 		// Add the articles
@@ -176,11 +182,11 @@ class ModuleNewsListTags extends \ModuleNewsList
 
 		$this->Template->archives = $this->news_archives;
 		// new code for tags
-		$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
+		$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
 		$headlinetags = array();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
-			$headlinetags = array_merge($headlinetags, array(\TagHelper::decode(\Input::get('tag'))));
+			$headlinetags = array_merge($headlinetags, array(TagHelper::decode(Input::get('tag'))));
 			if (!empty($relatedlist))
 			{
 				$headlinetags = array_merge($headlinetags, $relatedlist);
@@ -195,15 +201,15 @@ class ModuleNewsListTags extends \ModuleNewsList
 	 */
 	protected function compile()
 	{
-		\TagHelper::$config['news_showtags'] = $this->news_showtags;
-		\TagHelper::$config['news_jumpto'] = $this->tag_jumpTo;
-		\TagHelper::$config['news_tag_named_class'] = $this->tag_named_class;
-		if ((strlen(\TagHelper::decode(\Input::get('tag'))) && (!$this->tag_ignore)) || (strlen($this->tag_filter)))
+		TagHelper::$config['news_showtags'] = $this->news_showtags;
+		TagHelper::$config['news_jumpto'] = $this->tag_jumpTo;
+		TagHelper::$config['news_tag_named_class'] = $this->tag_named_class;
+		if ((strlen(TagHelper::decode(Input::get('tag'))) && (!$this->tag_ignore)) || (strlen($this->tag_filter)))
 		{
 			$tagids = array();
 			
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$alltags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$alltags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 			$first = true;
 			if (strlen($this->tag_filter))
 			{

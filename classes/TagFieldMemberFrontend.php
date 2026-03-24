@@ -8,9 +8,13 @@
  * @filesource
  */
 
-namespace Contao;
-use Contao\StringUtil;
+namespace VHUG\ContaoTags;
+
 use Contao\ArrayUtil;
+use Contao\Database;
+use Contao\FormText;
+use Contao\FrontendUser;
+use Contao\StringUtil;
 
 /**
  * Class TagFieldFrontend
@@ -20,7 +24,7 @@ use Contao\ArrayUtil;
  * @author     Helmut Schottmüller <https://github.com/hschottm/tags_members>
  * @package    Controller
  */
-class TagFieldMemberFrontend extends \FormText
+class TagFieldMemberFrontend extends FormText
 {
 	protected $blnSubmitInput = true;
 	protected $strTagTable = "";
@@ -35,15 +39,15 @@ class TagFieldMemberFrontend extends \FormText
 	{
 		if ($this->blnSubmitInput)
 		{
-			$this->import('FrontendUser', 'User');
-			$this->import('Database');
+			$user = FrontendUser::getInstance();
+			$this->Database = Database::getInstance();
 			$this->Database->prepare("DELETE FROM tl_tag WHERE from_table = ? AND tid = ?")
-				->execute('tl_member', $this->User->id);
+				->execute('tl_member', $user->id);
 			$tags = array_filter(StringUtil::trimsplit(",", $value), 'strlen');
 			foreach ($tags as $tag)
 			{
 				$this->Database->prepare("INSERT INTO tl_tag (tid, tag, from_table) VALUES (?, ?, ?)")
-					->execute($this->User->id, $tag, 'tl_member');
+					->execute($user->id, $tag, 'tl_member');
 			}
 			return "";
 		}
@@ -56,10 +60,10 @@ class TagFieldMemberFrontend extends \FormText
 	 */
 	protected function readTags()
 	{
-		$this->import('FrontendUser', 'User');
-		$this->import('Database');
+		$user = FrontendUser::getInstance();
+		$this->Database = Database::getInstance();
 		$arrTags = $this->Database->prepare("SELECT tag FROM tl_tag WHERE tid = ? AND from_table = ? ORDER BY tag ASC")
-			->execute($this->User->id, 'tl_member')
+			->execute($user->id, 'tl_member')
 			->fetchEach('tag');
 		return count($arrTags) ? implode(",", $arrTags) : '';
 	}
@@ -125,11 +129,11 @@ class TagFieldMemberFrontend extends \FormText
 		 */
 		if (is_array($GLOBALS['TL_JAVASCRIPT']))
 		{
-			ArrayUtil::arrayInsert($GLOBALS['TL_JAVASCRIPT'], 1, 'system/modules/tags/assets/tag.js');
+			ArrayUtil::arrayInsert($GLOBALS['TL_JAVASCRIPT'], 1, 'bundles/contaotags/tag.js');
 		}
 		else
 		{
-			$GLOBALS['TL_JAVASCRIPT'] = array('system/modules/tags/assets/tag.js');
+			$GLOBALS['TL_JAVASCRIPT'] = array('bundles/contaotags/tag.js');
 		}
 		$taglist = new TagList('tl_member');
 		$taglist->maxtags = $this->intMaxTags;

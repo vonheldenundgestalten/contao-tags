@@ -1,6 +1,9 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Input;
+use Contao\ModuleLastEvents;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -10,7 +13,7 @@ namespace Contao;
  * @license LGPL-3.0+
  */
 
-class ModuleLastEventsTags extends \ModuleLastEvents
+class ModuleLastEventsTags extends ModuleLastEvents
 {
 
     /**
@@ -26,14 +29,14 @@ class ModuleLastEventsTags extends \ModuleLastEvents
     protected function getAllEvents($arrCalendars, $intStart, $intEnd, $blnFeatured = null)
 	{
 		$arrAllEvents = parent::getAllEvents($arrCalendars, $intStart, $intEnd, $blnFeatured);
-		if (strlen(\TagHelper::decode(\Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
 			$limit = null;
 			$offset = 0;
 			$tagids = array();
 			
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$alltags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$alltags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 			foreach ($alltags as $tag)
 			{
 				if (count($tagids))
@@ -76,14 +79,14 @@ class ModuleLastEventsTags extends \ModuleLastEvents
 	protected function compile()
 	{
 		parent::compile();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$this->Template->tags_activetags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$this->Template->tags_activetags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 		}
 		if (strlen($this->Template->events) == 0)
 		{
-			$this->Template->tags_activetags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$this->Template->tags_activetags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 			$this->Template->events = $GLOBALS['TL_LANG']['MSC']['emptyevents'];
 		}
 	}

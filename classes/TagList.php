@@ -1,9 +1,11 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Database;
+use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
-use Contao\StringUtil;
 /**
  * Contao Open Source CMS - tags extension
  *
@@ -12,7 +14,7 @@ use Contao\StringUtil;
  * @license LGPL-3.0+
  */
 
-class TagList extends \System
+class TagList extends System
 {
 	protected $forTable = "";
 	protected $strTagTable = "tl_tag";
@@ -24,12 +26,13 @@ class TagList extends \System
 	protected $arrPages = array();
 	protected $arrArticles = array();
 	protected $intTopNumber = 10;
+	protected $Database;
 
 	function __construct($forTable = "")
 	{
 		parent::__construct();
 		$this->forTable = $forTable;
-		$this->import('Database');
+		$this->Database = Database::getInstance();
 	}
 
 	public function getRelatedTagList($for_tags, $blnExcludeUnpublishedItems = true)
@@ -459,7 +462,6 @@ class TagList extends \System
 				$this->boolNamedClass = $varValue;
 				break;
 			default:
-				parent::__set($strKey, $varValue);
 				break;
 		}
 	}
@@ -495,8 +497,7 @@ class TagList extends \System
 				return $this->boolNamedClass;
 				break;
 			default:
-				return parent::__get($strKey);
-				break;
+				return null;
 		}
 	}
 }

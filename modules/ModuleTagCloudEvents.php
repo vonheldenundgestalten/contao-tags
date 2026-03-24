@@ -1,6 +1,10 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\BackendTemplate;
+use Contao\Input;
+use Contao\Module;
 use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @author     Helmut Schottmüller <https://github.com/hschottm>
  * @package    Controller
  */
-class ModuleTagCloudEvents extends \ModuleTagCloud
+class ModuleTagCloudEvents extends ModuleTagCloud
 {
 	/**
 	 * Display a wildcard in the back end
@@ -28,7 +32,7 @@ class ModuleTagCloudEvents extends \ModuleTagCloud
 	 */
 	public function generate()
 	{
-		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''))
+		$isBackend = System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer ()->get('request_stack')->getCurrentRequest() ?? Request::create(''));
 		if ($isBackend)
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
@@ -47,10 +51,10 @@ class ModuleTagCloudEvents extends \ModuleTagCloud
 		$this->arrTags = $taglist->getTagList();
 		if (strlen($this->tag_topten_number) && $this->tag_topten_number > 0) $taglist->topnumber = $this->tag_topten_number;
 		if ($this->tag_topten) $this->arrTopTenTags = $taglist->getTopTenTagList();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))) && $this->tag_related)
+		if (strlen(TagHelper::decode(Input::get('tag'))) && $this->tag_related)
 		{
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$this->arrRelated = $taglist->getRelatedTagList(array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist));
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$this->arrRelated = $taglist->getRelatedTagList(array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist));
 		}
 		if (count($this->arrTags) < 1)
 		{

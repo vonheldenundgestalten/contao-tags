@@ -7,6 +7,8 @@
  *
  * @license LGPL-3.0+
  */
+use Contao\Backend;
+use Contao\DataContainer;
 use Contao\StringUtil;
 
 if (@class_exists("tl_calendar_events"))
@@ -25,15 +27,15 @@ if (is_array($GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback
 }
 */
 
-class tl_calendar_events_tags extends \Backend
+class tl_calendar_events_tags extends Backend
 {
-	public function deleteEvents(\DataContainer $dc, $undoId)
+	public function deleteEvents(DataContainer $dc, $undoId)
 	{
 		$this->Database->prepare("DELETE FROM tl_tag WHERE from_table = ? AND tid = ?")
 			->execute($dc->table, $dc->id);
 	}
 	
-    public function onCopy($insertID, \DataContainer $dc)
+    public function onCopy($insertID, DataContainer $dc)
     {
 		$objTags = $this->Database->prepare("SELECT * FROM tl_tag WHERE tid = ? AND from_table = ?")->execute($dc->id, $dc->table);
 		$tags = array();

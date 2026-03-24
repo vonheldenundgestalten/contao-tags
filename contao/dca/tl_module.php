@@ -8,7 +8,10 @@
  * @license LGPL-3.0+
  */
 
-class tl_module_tags extends \Backend
+use Contao\Backend;
+use Contao\DataContainer;
+
+class tl_module_tags extends Backend
 {
 	/**
 	 * Return available tag tables
@@ -79,7 +82,7 @@ class tl_module_tags extends \Backend
 	}
 }
 
-class tl_module_tags_articles extends \Backend
+class tl_module_tags_articles extends Backend
 {
 	public function getArticlelistTemplates(DataContainer $dc)
 	{
@@ -111,7 +114,7 @@ class tl_module_tags_articles extends \Backend
  * @author     Helmut Schottmüller <https://github.com/hschottm>
  * @package    Controller
  */
-class tl_module_tags_events extends \Backend
+class tl_module_tags_events extends Backend
 {
 	/**
 	 * Return available calendars
@@ -142,7 +145,7 @@ class tl_module_tags_events extends \Backend
  * @author     Helmut Schottmüller <https://github.com/hschottm>
  * @package    Controller
  */
-class tl_module_tags_news extends \Backend
+class tl_module_tags_news extends Backend
 {
 	/**
 	 * Return available news archives

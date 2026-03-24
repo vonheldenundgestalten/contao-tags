@@ -8,10 +8,11 @@
  * @filesource
  */
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
-use Contao\StringUtil;
 /**
  * Class TagListMembers
  *

@@ -1,6 +1,9 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Input;
+use Contao\ModuleCalendar;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -10,7 +13,7 @@ namespace Contao;
  * @license LGPL-3.0+
  */
 
-class ModuleCalendarTags extends \ModuleCalendar
+class ModuleCalendarTags extends ModuleCalendar
 {
 
 	/**
@@ -27,14 +30,14 @@ class ModuleCalendarTags extends \ModuleCalendar
 	{
 		$arrAllEvents = parent::getAllEvents($arrCalendars, $intStart, $intEnd, $blnFeatured);
 		if (($this->tag_ignore) && !strlen($this->tag_filter)) return $arrAllEvents;
-		if (strlen(\TagHelper::decode(\Input::get('tag'))) || strlen($this->tag_filter))
+		if (strlen(TagHelper::decode(Input::get('tag'))) || strlen($this->tag_filter))
 		{
 			$limit = null;
 			$offset = 0;
 			$tagids = array();
 			if (strlen($this->tag_filter)) $tagids = $this->getFilterTags();
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$tagArray = (strlen(\TagHelper::decode(\Input::get('tag')))) ? array(\TagHelper::decode(\Input::get('tag'))) : array();
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$tagArray = (strlen(TagHelper::decode(Input::get('tag')))) ? array(TagHelper::decode(Input::get('tag'))) : array();
 			$alltags = array_merge($tagArray, $relatedlist);
 			foreach ($alltags as $tag)
 			{
@@ -89,7 +92,7 @@ class ModuleCalendarTags extends \ModuleCalendar
 	protected function compileWeeks()
 	{
 		$arrDays = parent::compileWeeks();
-		$helper = new \TagHelper();
+		$helper = new TagHelper();
 		foreach ($arrDays as $strWeekClass => $week)
 		{
 			foreach ($week as $i => $event)

@@ -7,11 +7,13 @@
  *
  * @license LGPL-3.0+
  */
+use Contao\Backend;
+use Contao\DataContainer;
 use Contao\StringUtil;
 
-class tl_article_tags extends \Backend
+class tl_article_tags extends Backend
 {
-	public function removeArticle(\DataContainer $dc, $undoId)
+	public function removeArticle(DataContainer $dc, $undoId)
 	{
 		$this->Database->prepare("DELETE FROM tl_tag WHERE from_table = ? AND tid = ?")
 			->execute($dc->table, $dc->id);
@@ -24,7 +26,7 @@ class tl_article_tags extends \Backend
 		}
 	}
 
-	public function removePage(\DataContainer $dc, $undoId)
+	public function removePage(DataContainer $dc, $undoId)
 	{
 		// remove tags of all articles in the page
 		$arrArticles = $this->Database->prepare("SELECT DISTINCT id FROM tl_article WHERE pid = ?")
@@ -43,7 +45,7 @@ class tl_article_tags extends \Backend
 		}
 	}
 
-    public function onCopy($insertID, \DataContainer $dc)
+    public function onCopy($insertID, DataContainer $dc)
     {
 		$objTags = $this->Database->prepare("SELECT * FROM tl_tag WHERE tid = ? AND from_table = ?")->execute($dc->id, $dc->table);
 		$tags = array();

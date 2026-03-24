@@ -1,9 +1,13 @@
 <?php
 
-namespace Contao;
-use Contao\System; 
-use Symfony\Component\HttpFoundation\Request;
+namespace VHUG\ContaoTags;
+
+use Contao\BackendTemplate;
+use Contao\Input;
+use Contao\Module;
 use Contao\StringUtil;
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 /**
  * PHP version 5
  * @copyright  Helmut Schottmüller 2008-2013
@@ -21,7 +25,7 @@ use Contao\StringUtil;
  * @author     Helmut Schottmüller <https://github.com/hschottm>
  * @package    Controller
  */
-class ModuleTagCloudArticles extends \ModuleTagCloud
+class ModuleTagCloudArticles extends ModuleTagCloud
 {
 	/**
 	 * Display a wildcard in the back end
@@ -50,10 +54,10 @@ class ModuleTagCloudArticles extends \ModuleTagCloud
 		if (strlen($this->tag_articles)) $taglist->articles = StringUtil::deserialize($this->tag_articles, TRUE);
 		$this->arrTags = $taglist->getTagList();
 		if ($this->tag_topten) $this->arrTopTenTags = $taglist->getTopTenTagList();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))) && $this->tag_related)
+		if (strlen(TagHelper::decode(Input::get('tag'))) && $this->tag_related)
 		{
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$this->arrRelated = $taglist->getRelatedTagList(array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist));
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$this->arrRelated = $taglist->getRelatedTagList(array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist));
 		}
 		if (count($this->arrTags) < 1)
 		{

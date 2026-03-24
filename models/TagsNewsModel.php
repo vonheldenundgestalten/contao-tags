@@ -8,10 +8,13 @@
  * @license LGPL-3.0+
  */
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\NewsModel;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
-class TagsNewsModel extends \NewsModel
+
+class TagsNewsModel extends NewsModel
 {
 	/**
 	 * Count published news items by their parent ID

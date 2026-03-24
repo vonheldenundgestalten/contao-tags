@@ -1,9 +1,15 @@
 <?php
 
-namespace Contao;
-use Contao\System; 
-use Symfony\Component\HttpFoundation\Request;
+namespace VHUG\ContaoTags;
+
+use Contao\BackendTemplate;
+use Contao\Database;
+use Contao\Environment;
+use Contao\Input;
+use Contao\Module;
 use Contao\StringUtil;
+use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 /**
  * Contao Open Source CMS - tags extension
  *
@@ -12,7 +18,7 @@ use Contao\StringUtil;
  * @license LGPL-3.0+
  */
 
-class ModuleGlobalArticlelist extends \Module
+class ModuleGlobalArticlelist extends Module
 {
 	private $block = false;
 
@@ -22,6 +28,7 @@ class ModuleGlobalArticlelist extends \Module
 	 * @var string
 	 */
 	protected $strTemplate = 'mod_global_articlelist';
+	protected $Database;
 
 
 	/**
@@ -49,8 +56,9 @@ class ModuleGlobalArticlelist extends \Module
 	 */
 	protected function compile()
 	{
+		$this->Database = Database::getInstance();
 		global $objPage;
-		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser(); 
+		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
 
 		// block this method to prevent recursive call of getArticle if the HTML of an article is the same as the current article
 		if ($this->block)
@@ -62,7 +70,7 @@ class ModuleGlobalArticlelist extends \Module
 		$articles = array();
 		$id = $objPage->id;
 
-		$this->Template->request = \Environment::get('request');
+		$this->Template->request = Environment::get('request');
 
 		$time = time();
 
@@ -71,13 +79,13 @@ class ModuleGlobalArticlelist extends \Module
 			->execute($time, $time);
 
 		$tagids = array();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
 			$limit = null;
 			$offset = 0;
 			
 			$objIds = $this->Database->prepare("SELECT tid FROM tl_tag WHERE from_table = ? AND tag = ?")
-				->execute('tl_article', \TagHelper::decode(\Input::get('tag')));
+				->execute('tl_article', TagHelper::decode(Input::get('tag')));
 			if ($objIds->numRows)
 			{
 				while ($objIds->next())
@@ -121,10 +129,10 @@ class ModuleGlobalArticlelist extends \Module
 			}
 		}
 		$headlinetags = array();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$headlinetags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$headlinetags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 		}
 		$this->Template->tags_activetags = $headlinetags;
 		$this->Template->articles = $articles;

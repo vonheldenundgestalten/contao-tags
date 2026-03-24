@@ -1,6 +1,12 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Config;
+use Contao\Date;
+use Contao\Input;
+use Contao\ModuleNewsArchive;
+use Contao\Pagination;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -10,7 +16,7 @@ namespace Contao;
  * @license LGPL-3.0+
  */
 
-class ModuleNewsArchiveTags extends \ModuleNewsArchive
+class ModuleNewsArchiveTags extends ModuleNewsArchive
 {
 	/**
 	 * Read tags from database
@@ -50,9 +56,9 @@ class ModuleNewsArchiveTags extends \ModuleNewsArchive
 		$intBegin = 0;
 		$intEnd = 0;
 
-		$intYear = \Input::get('year');
-		$intMonth = \Input::get('month');
-		$intDay = \Input::get('day');
+		$intYear = Input::get('year');
+		$intMonth = Input::get('month');
+		$intDay = Input::get('day');
 
 		// Jump to the current period
 		if (!isset($_GET['year']) && !isset($_GET['month']) && !isset($_GET['day']) && $this->news_jumpToCurrent != 'all_items')
@@ -80,7 +86,7 @@ class ModuleNewsArchiveTags extends \ModuleNewsArchive
 			if ($intYear)
 			{
 				$strDate = $intYear;
-				$objDate = new \Date($strDate, 'Y');
+				$objDate = new Date($strDate, 'Y');
 				$intBegin = $objDate->yearBegin;
 				$intEnd = $objDate->yearEnd;
 				$this->headline .= ' ' . date('Y', $objDate->tstamp);
@@ -88,18 +94,18 @@ class ModuleNewsArchiveTags extends \ModuleNewsArchive
 			elseif ($intMonth)
 			{
 				$strDate = $intMonth;
-				$objDate = new \Date($strDate, 'Ym');
+				$objDate = new Date($strDate, 'Ym');
 				$intBegin = $objDate->monthBegin;
 				$intEnd = $objDate->monthEnd;
-				$this->headline .= ' ' . \Date::parse('F Y', $objDate->tstamp);
+				$this->headline .= ' ' . Date::parse('F Y', $objDate->tstamp);
 			}
 			elseif ($intDay)
 			{
 				$strDate = $intDay;
-				$objDate = new \Date($strDate, 'Ymd');
+				$objDate = new Date($strDate, 'Ymd');
 				$intBegin = $objDate->dayBegin;
 				$intEnd = $objDate->dayEnd;
-				$this->headline .= ' ' . \Date::parse($objPage->dateFormat, $objDate->tstamp);
+				$this->headline .= ' ' . Date::parse($objPage->dateFormat, $objDate->tstamp);
 			}
 			elseif ($this->news_jumpToCurrent == 'all_items')
 			{
@@ -120,7 +126,7 @@ class ModuleNewsArchiveTags extends \ModuleNewsArchive
 		if ($this->perPage > 0)
 		{
 			// Get the total number of items
-			$intTotal = \TagsNewsModel::countPublishedFromToByPidsAndIds($intBegin, $intEnd, $this->news_archives, $arrIds);
+			$intTotal = TagsNewsModel::countPublishedFromToByPidsAndIds($intBegin, $intEnd, $this->news_archives, $arrIds);
 
 			if ($intTotal > 0)
 			{
@@ -128,7 +134,7 @@ class ModuleNewsArchiveTags extends \ModuleNewsArchive
 
 				// Get the current page
 				$id = 'page_a' . $this->id;
-				$page = (\Input::get($id) !== null) ? \Input::get($id) : 1;
+				$page = (Input::get($id) !== null) ? Input::get($id) : 1;
 
 				// Do not index or cache the page if the page number is outside the range
 				if ($page < 1 || $page > max(ceil($total/$this->perPage), 1))
@@ -143,7 +149,7 @@ class ModuleNewsArchiveTags extends \ModuleNewsArchive
 				$offset = (max($page, 1) - 1) * $this->perPage;
 
 				// Add the pagination menu
-				$objPagination = new \Pagination($total, $this->perPage, \Config::get('maxPaginationLinks'), $id);
+				$objPagination = new Pagination($total, $this->perPage, Config::get('maxPaginationLinks'), $id);
 				$this->Template->pagination = $objPagination->generate("\n  ");
 			}
 		}
@@ -151,11 +157,11 @@ class ModuleNewsArchiveTags extends \ModuleNewsArchive
 		// Get the news items
 		if (isset($limit))
 		{
-			$objArticles = \TagsNewsModel::findPublishedFromToByPidsAndIds($intBegin, $intEnd, $this->news_archives, $arrIds, $limit, $offset);
+			$objArticles = TagsNewsModel::findPublishedFromToByPidsAndIds($intBegin, $intEnd, $this->news_archives, $arrIds, $limit, $offset);
 		}
 		else
 		{
-			$objArticles = \TagsNewsModel::findPublishedFromToByPidsAndIds($intBegin, $intEnd, $this->news_archives, $arrIds);
+			$objArticles = TagsNewsModel::findPublishedFromToByPidsAndIds($intBegin, $intEnd, $this->news_archives, $arrIds);
 		}
 
 		// Add the articles
@@ -166,9 +172,9 @@ class ModuleNewsArchiveTags extends \ModuleNewsArchive
 
 		$headlinetags = array();
 
-		if (strlen(\TagHelper::decode(\Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
-			$headlinetags = array_merge($headlinetags, array(\TagHelper::decode(\Input::get('tag'))));
+			$headlinetags = array_merge($headlinetags, array(TagHelper::decode(Input::get('tag'))));
 			if (!empty($relatedlist))
 			{
 				$headlinetags = array_merge($headlinetags, $relatedlist);
@@ -186,15 +192,15 @@ class ModuleNewsArchiveTags extends \ModuleNewsArchive
 	 */
 	protected function compile()
 	{
-		\TagHelper::$config['news_showtags'] = $this->news_showtags;
-		\TagHelper::$config['news_jumpto'] = $this->tag_jumpTo;
-		\TagHelper::$config['news_tag_named_class'] = $this->tag_named_class;
-		if ((strlen(\TagHelper::decode(\Input::get('tag'))) && (!$this->tag_ignore)) || (strlen($this->tag_filter)))
+		TagHelper::$config['news_showtags'] = $this->news_showtags;
+		TagHelper::$config['news_jumpto'] = $this->tag_jumpTo;
+		TagHelper::$config['news_tag_named_class'] = $this->tag_named_class;
+		if ((strlen(TagHelper::decode(Input::get('tag'))) && (!$this->tag_ignore)) || (strlen($this->tag_filter)))
 		{
 			$tagids = array();
 			
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$alltags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$alltags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 			$first = true;
 			if (strlen($this->tag_filter))
 			{

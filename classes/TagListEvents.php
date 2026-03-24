@@ -1,7 +1,8 @@
 <?php
 
-namespace Contao;
-use Contao\System; 
+namespace VHUG\ContaoTags;
+
+use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 /**
  * Class TagListEvents

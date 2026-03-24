@@ -1,7 +1,10 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Database;
 use Contao\StringUtil;
+use Contao\TextField;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -11,7 +14,7 @@ use Contao\StringUtil;
  * @license LGPL-3.0+
  */
 
-class TagField extends \TextField
+class TagField extends TextField
 {
 	protected $blnSubmitInput = true;
 	protected $strTagTable = "";
@@ -26,7 +29,7 @@ class TagField extends \TextField
 	{
 		if ($this->blnSubmitInput)
 		{
-			$this->import('Database');
+			$this->Database = Database::getInstance();
 			$this->Database->prepare("DELETE FROM tl_tag WHERE from_table = ? AND tid = ?")
 				->execute($this->table, $this->activeRecord->id);
 			$tags = array_filter(StringUtil::trimsplit(",", $value), 'strlen');
@@ -47,7 +50,7 @@ class TagField extends \TextField
 	protected function readTags()
 	{
 		$arrTags = array();
-		$tags = \TagModel::findByIdAndTable($this->activeRecord->id, $this->table);
+		$tags = TagModel::findByIdAndTable($this->activeRecord->id, $this->table);
 		if ($tags)
 		{
 			while ($tags->next())

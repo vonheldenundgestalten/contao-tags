@@ -1,6 +1,12 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\BackendTemplate;
+use Contao\Database;
+use Contao\Environment;
+use Contao\Input;
+use Contao\Module;
 use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @license LGPL-3.0+
  */
 
-class ModuleTagContentList extends \Module
+class ModuleTagContentList extends Module
 {
 
 	/**
@@ -23,6 +29,7 @@ class ModuleTagContentList extends \Module
 	protected $strTemplate = 'mod_tag_contentlist';
 	protected $arrPages = array();
 	protected $arrTags = array();
+	protected $Database;
 
 
 	/**
@@ -51,7 +58,7 @@ class ModuleTagContentList extends \Module
 		$id = $objPage->id;
 		$hasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser(); 
 
-		$this->Template->request = \Environment::get('request');
+		$this->Template->request = Environment::get('request');
 
 		$time = time();
 
@@ -60,13 +67,13 @@ class ModuleTagContentList extends \Module
 			->execute($time, $time);
 
 		$tagids = array();
-		if (strlen(\TagHelper::decode(Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
 			$limit = null;
 			$offset = 0;
 			
 			$objIds = $this->Database->prepare("SELECT tid FROM tl_tag WHERE from_table = ? AND tag = ?")
-				->execute('tl_article', \TagHelper::decode(Input::get('tag')));
+				->execute('tl_article', TagHelper::decode(Input::get('tag')));
 			if ($objIds->numRows)
 			{
 				while ($objIds->next())
@@ -91,18 +98,18 @@ class ModuleTagContentList extends \Module
 					{
 						if ($this->linktoarticles)
 						{ // link to articles
-							$articles[] = array('content' => '<a href="' . \TagHelper::getPageObj($objArticle->tags_jumpto)->getFrontendUrl('/articles/' . ((!$GLOBALS['TL_CONFIG']['disableAlias'] && strlen($objArticle->aAlias)) ? $objArticle->aAlias : $objArticle->aId)) . '" title="' . StringUtil::specialchars($objArticle->title) . '">' . $objArticle->title . '</a>', 'tags' => $taglist, 'data' => $objArticle->row());
+							$articles[] = array('content' => '<a href="' . TagHelper::getPageObj($objArticle->tags_jumpto)->getFrontendUrl('/articles/' . ((!$GLOBALS['TL_CONFIG']['disableAlias'] && strlen($objArticle->aAlias)) ? $objArticle->aAlias : $objArticle->aId)) . '" title="' . StringUtil::specialchars($objArticle->title) . '">' . $objArticle->title . '</a>', 'tags' => $taglist, 'data' => $objArticle->row());
 						}
 						else
 						{ // link to pages
-							$articles[] = array('content' => '<a href="' . \TagHelper::getPageObj($objArticle->tags_jumpto)->getFrontendUrl() . '" title="' . StringUtil::specialchars($objArticle->title) . '">' . $objArticle->title . '</a>', 'tags' => $taglist, 'data' => $objArticle->row());
+							$articles[] = array('content' => '<a href="' . TagHelper::getPageObj($objArticle->tags_jumpto)->getFrontendUrl() . '" title="' . StringUtil::specialchars($objArticle->title) . '">' . $objArticle->title . '</a>', 'tags' => $taglist, 'data' => $objArticle->row());
 						}
 					}
 				}
 			}
 		}
-		$relatedlist = (strlen(\TagHelper::decode(Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(Input::get('related'))) : array();
-		$headlinetags = array_merge(array(\TagHelper::decode(Input::get('tag'))), $relatedlist);
+		$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+		$headlinetags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 		$this->Template->tags_activetags = $headlinetags;
 		$this->Template->articles = $articles;
 		$this->Template->empty = $GLOBALS['TL_LANG']['MSC']['emptyarticles'];
@@ -156,10 +163,10 @@ class ModuleTagContentList extends \Module
 	protected function getTags()
 	{
 		$this->arrTags = array();
-		if (strlen(\TagHelper::decode(Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
 			$this->arrTags = $this->Database->prepare("SELECT tid FROM tl_tag WHERE from_table = ? AND tag = ?")
-				->execute($this->tagsource, \TagHelper::decode(Input::get('tag')))
+				->execute($this->tagsource, TagHelper::decode(Input::get('tag')))
 				->fetchEach('tid');
 		}
 	}
@@ -302,6 +309,7 @@ class ModuleTagContentList extends \Module
 	 */
 	protected function compile()
 	{
+		$this->Database = Database::getInstance();
 		global $objPage;
 
 		switch ($this->objecttype)

@@ -1,6 +1,7 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 

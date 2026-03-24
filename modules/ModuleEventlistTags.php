@@ -1,9 +1,20 @@
 <?php
 
-namespace Contao;
-use Contao\System;
-use Contao\StringUtil;
+namespace VHUG\ContaoTags;
+
+use Contao\CalendarEventsModel;
+use Contao\Config;
 use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\Date;
+use Contao\Environment;
+use Contao\Events;
+use Contao\FilesModel;
+use Contao\FrontendTemplate;
+use Contao\Input;
+use Contao\ModuleEventlist;
+use Contao\Pagination;
+use Contao\StringUtil;
+use Contao\System;
 
 /**
  * Contao Open Source CMS - tags extension
@@ -13,7 +24,7 @@ use Contao\CoreBundle\Exception\PageNotFoundException;
  * @license LGPL-3.0+
  */
 
-class ModuleEventlistTags extends \ModuleEventlist
+class ModuleEventlistTags extends ModuleEventlist
 {
 
     /**
@@ -31,15 +42,15 @@ class ModuleEventlistTags extends \ModuleEventlist
 		$arrAllEvents = parent::getAllEvents($arrCalendars, $intStart, $intEnd, $blnFeatured);
 		if (($this->tag_ignore) && !strlen($this->tag_filter)) return $arrAllEvents;
 
-		if (strlen(\TagHelper::decode(\Input::get('tag'))) || strlen($this->tag_filter))
+		if (strlen(TagHelper::decode(Input::get('tag'))) || strlen($this->tag_filter))
 		{
 			$limit = null;
 			$offset = 0;
 			$tagids = array();
 			if (strlen($this->tag_filter)) $tagids = $this->getFilterTags();
 
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$tagArray = (strlen(\TagHelper::decode(\Input::get('tag')))) ? array(\TagHelper::decode(\Input::get('tag'))) : array();
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$tagArray = (strlen(TagHelper::decode(Input::get('tag')))) ? array(TagHelper::decode(Input::get('tag'))) : array();
 			$alltags = array_merge($tagArray, $relatedlist);
 			foreach ($alltags as $tag)
 			{
@@ -401,7 +412,7 @@ class ModuleEventlistTags extends \ModuleEventlist
 			$objTemplate->showTags = $this->event_showtags;
 			if ($this->event_showtags)
 			{
-				$helper = new \TagHelper();
+				$helper = new TagHelper();
 				$tagsandlist = $helper->getTagsAndTaglistForIdAndTable($event['id'], 'tl_calendar_events', $this->tag_jumpTo);
 				$tags = $tagsandlist['tags'];
 				$taglist = $tagsandlist['taglist'];
@@ -451,7 +462,7 @@ class ModuleEventlistTags extends \ModuleEventlist
 
 		////////// CHANGES BY ModuleEventlistTags
 		$headlinetags = array();
-		if ((strlen(\TagHelper::decode(\Input::get('tag'))) && (!$this->tag_ignore)) || (strlen($this->tag_filter)))
+		if ((strlen(TagHelper::decode(Input::get('tag'))) && (!$this->tag_ignore)) || (strlen($this->tag_filter)))
 		{
 			if (strlen($this->tag_filter))
 			{
@@ -463,8 +474,8 @@ class ModuleEventlistTags extends \ModuleEventlist
 			{
 				$headlinetags = array();
 			}
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$tagArray = (strlen(\TagHelper::decode(\Input::get('tag')))) ? array(\TagHelper::decode(\Input::get('tag'))) : array();
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$tagArray = (strlen(TagHelper::decode(Input::get('tag')))) ? array(TagHelper::decode(Input::get('tag'))) : array();
 			$headlinetags = array_merge($headlinetags, $tagArray);
 			if (!empty($relatedlist))
 			{
@@ -473,7 +484,7 @@ class ModuleEventlistTags extends \ModuleEventlist
 		}
 		if (strlen($this->Template->events) == 0)
 		{
-			$headlinetags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$headlinetags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 			$this->Template->events = $GLOBALS['TL_LANG']['MSC']['emptyevents'];
 		}
 		$this->Template->tags_activetags = $headlinetags;

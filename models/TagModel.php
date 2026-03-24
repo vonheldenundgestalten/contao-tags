@@ -8,9 +8,11 @@
  * @license LGPL-3.0+
  */
 
-namespace Contao;
+namespace VHUG\ContaoTags;
 
-class TagModel extends \Model
+use Contao\Model;
+
+class TagModel extends Model
 {
 
 	/**

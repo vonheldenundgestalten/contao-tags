@@ -7,7 +7,10 @@
  * @license    LGPL
  */
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\Backend;
+use Contao\Input;
 
 /**
  * Class TagMemberHelper
@@ -17,14 +20,14 @@ namespace Contao;
  * @author     Helmut Schottmüller <https://github.com/hschottm/tags_members>
  * @package    Controller
  */
-class TagMemberHelper extends \Backend
+class TagMemberHelper extends Backend
 {
 	public function setMemberlistOptions($moduleMemberList)
 	{
-		if (strlen(\TagHelper::decode(\Input::get('tag'))))
+		if (strlen(TagHelper::decode(Input::get('tag'))))
 		{
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$alltags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$alltags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 			$tagids = array();
 			$first = true;
 			foreach ($alltags as $tag)

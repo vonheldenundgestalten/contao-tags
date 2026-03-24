@@ -8,9 +8,12 @@
  * @license LGPL-3.0+
  */
 
-namespace Contao;
+namespace VHUG\ContaoTags;
 
-class NewsTags extends \News
+use Contao\FrontendTemplate;
+use Contao\News;
+
+class NewsTags extends News
 {
 	private $savedArticleId;
 	

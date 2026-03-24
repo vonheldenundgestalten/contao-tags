@@ -1,8 +1,14 @@
 <?php
 
-namespace Contao;
+namespace VHUG\ContaoTags;
+
+use Contao\BackendTemplate;
+use Contao\Database;
+use Contao\FilesModel;
+use Contao\Input;
+use Contao\Module;
 use Contao\StringUtil;
-use Contao\System; 
+use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 /**
  * Contao Open Source CMS - tags extension
@@ -12,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @license LGPL-3.0+
  */
 
-class ModuleTagListByCategory extends \Module
+class ModuleTagListByCategory extends Module
 {
 
 	/**
@@ -23,6 +29,7 @@ class ModuleTagListByCategory extends \Module
 	protected $sourcetables = array();
 	protected $arrPages = array();
 	protected $arrTags = array();
+	protected $Database;
 
 
 	/**
@@ -50,17 +57,18 @@ class ModuleTagListByCategory extends \Module
 	 */
 	protected function compile()
 	{
+		$this->Database = Database::getInstance();
 		$this->loadLanguageFile('tl_module');
 		$this->Template->news = array();
 		$this->Template->events = array();
 		$this->Template->other_pages = array();
 		$this->Template->pages = array();
-		if (strlen(\TagHelper::decode(\Input::get('tag'))) && count($this->sourcetables) > 0)
+		if (strlen(TagHelper::decode(Input::get('tag'))) && count($this->sourcetables) > 0)
 		{
 			$tagids = array();
 			$tagid_cats = array();
-			$relatedlist = (strlen(\TagHelper::decode(\Input::get('related')))) ? preg_split("/,/", \TagHelper::decode(\Input::get('related'))) : array();
-			$alltags = array_merge(array(\TagHelper::decode(\Input::get('tag'))), $relatedlist);
+			$relatedlist = (strlen(TagHelper::decode(Input::get('related')))) ? preg_split("/,/", TagHelper::decode(Input::get('related'))) : array();
+			$alltags = array_merge(array(TagHelper::decode(Input::get('tag'))), $relatedlist);
 			$first = true;
 			$marks = array();
 			foreach ($this->sourcetables as $table)
@@ -183,7 +191,7 @@ class ModuleTagListByCategory extends \Module
 			$i = 0;
 			foreach($objects as $object){
 				if($object['addImage'] == "1"){
-					$objPath = \FilesModel::findByUuid($object['singleSRC']);
+					$objPath = FilesModel::findByUuid($object['singleSRC']);
 					$objects[$i]['imageUrl'] = $objPath->path;
 				}
 				$i++;
