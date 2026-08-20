@@ -20,6 +20,9 @@
     "contao/core-bundle": "^5.3",
     "contao/manager-plugin": "^2.0"
   },
+  "replace": {
+    "hschottm/tags": "self.version"
+  },
   "autoload": {
     "psr-4": {
       "VHUG\\ContaoTags\\": "src/"
